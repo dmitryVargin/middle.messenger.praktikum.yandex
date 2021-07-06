@@ -13,3 +13,4 @@ Netlify https://adoring-morse-4ee1ae.netlify.app/
 
 Редактирование полей будет реализовано с помощью попапов.
 
+Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/1
