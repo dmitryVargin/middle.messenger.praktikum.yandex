@@ -9,7 +9,7 @@ const content = Templator.compileConcat([
       label: 'Почта',
       type: 'text',
       name: 'email',
-      errorText: 'Некоректный email',
+      errorText: 'Некорректный email',
     },
   },
   {
@@ -18,7 +18,7 @@ const content = Templator.compileConcat([
       label: 'Логин',
       type: 'text',
       name: 'login',
-      errorText: 'Некоректный логин',
+      errorText: 'Некорректный логин',
     },
   },
   {
@@ -45,7 +45,7 @@ const content = Templator.compileConcat([
       label: 'Телефон',
       type: 'number',
       name: 'phone',
-      errorText: 'Некоректный телефон',
+      errorText: 'Некорректный телефон',
     },
   },
   {
@@ -75,12 +75,11 @@ const content = Templator.compileConcat([
   },
 ]);
 
-const signupTmpl = `<div class="form signup-wrap">
-        <h1>Регистрация</h1>
-        <form>
-           ${content}
-        </form>
-        <a class="link" href="/login">Войти</a>
-    </div>`;
-
-export default signupTmpl;
+export default `
+  <div class='form signup-wrap'>
+    <h1>Регистрация</h1>
+    <form>
+      ${content}
+    </form>
+    <a class='link'>Войти</a>
+  </div>`;

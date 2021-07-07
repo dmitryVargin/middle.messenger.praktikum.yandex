@@ -25,17 +25,16 @@ const content = Templator.compileConcat([
     template: button,
     context: {
       type: 'submit',
-      text: 'Авторизироваться',
+      text: 'Авторизоваться',
     },
   },
 ]);
 
-const loginTmpl = `
-    <div class="form login-wrap">
-        <h1>Вход</h1>
-        <form id="login-form" action="javascript:">
-            ${content}
-        </form>
-        <a class="link" href="/signup">Нет аккаунта?</a>
-</div>`;
-export default loginTmpl;
+export default `
+  <div class="form login-wrap">
+    <h1>Вход</h1>
+    <form>
+      ${content}
+    </form>
+    <a class="link">Нет аккаунта?</a>
+  </div>`;

@@ -1,6 +1,8 @@
 import arrowImg from 'url:../../../static/img/arrow.svg';
 
-const arrowButton = `<div class="arrow-button {{classes}}">
-  <img src=${arrowImg} alt=""/>
-</div>`;
-export default arrowButton;
+export default ({ direction }) => {
+  return `
+    <div class='arrow-button ${direction || ''}'>
+      <img src='${arrowImg}' alt=''/>
+    </div>`;
+};

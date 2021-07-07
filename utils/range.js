@@ -8,7 +8,9 @@ function range(start = 0, end, step = 1, isRight) {
     ? notEmptyArgs.length - 1
     : notEmptyArgs.length;
   if (rangeArgsQuantity === 1) {
-    if (typeof start !== 'number') return;
+    if (typeof start !== 'number') {
+      return;
+    }
     if (start === 0) {
       return res;
     }
@@ -26,8 +28,10 @@ function range(start = 0, end, step = 1, isRight) {
       typeof start !== 'number' ||
       typeof end !== 'number' ||
       typeof step !== 'number'
-    )
+    ) {
       return;
+    }
+
     let innerStep = step ? step : 1;
     if (step === 0) {
       for (let i = start; i <= Math.abs(end - start); i++) {
