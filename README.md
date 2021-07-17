@@ -1,4 +1,7 @@
+
 Учебный проект - messenger
+Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/1
+### Ветка, в которой делаете задания спринта, должна называться sprint_i, где i - номер спринта. Не переименовывайте её.
 
 Прототип: https://www.figma.com/file/nVtwoB3MtIj3BIqv822xtd/Prototypes?node-id=0%3A1
 
