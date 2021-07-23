@@ -1,12 +1,15 @@
-import arrowButton from '../../components/arrowButton';
-import Templator from '../../../utils/templator';
+import ArrowButton from '../../components/ArrowButton/index';
+import Templator from '../../utils/templator';
 
-const arrowBtn = Templator.compile(arrowButton({ direction: 'toLeft' }));
+// const arrowBtn = Templator.compile(arrowButton({ direction: 'toLeft' }));
+const arrowBtnTmpl = new ArrowButton({
+  className: 'toLeft',
+}).tmpl;
 
 export default `
   <div class='profile-wrap'>
     <div class='sidebar'>
-      ${arrowBtn}
+      ${arrowBtnTmpl}
     </div>
     <div class='profile'>
       <div class='img-wrap'>

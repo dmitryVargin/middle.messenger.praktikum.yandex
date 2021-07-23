@@ -1,6 +1,6 @@
-import defaultInput from '../../components/defaultInput';
-import button from '../../components/button';
-import Templator from '../../../utils/templator';
+import defaultInput from '../../components/DefaultInput';
+import button from '../../components/Button';
+import Templator from '../../utils/templator';
 
 const content = Templator.compileConcat([
   {

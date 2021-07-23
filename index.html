@@ -18,6 +18,17 @@
   <body>
     <div id="root"></div>
 
-    <script src="src/index.js"></script>
+    <script src="src/index.ts"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script>
+      // compile the template
+      var template = Handlebars.compile('Handlebars <b>{{{doesWhat}}}</b>');
+      // execute the compiled template and print the output to the console
+      const x = document.createElement('div');
+      x.append('<span>qwe</span>');
+      console.log(x);
+      console.log(111111, template({ doesWhat: x }));
+    </script>
   </body>
 </html>

@@ -1,10 +1,10 @@
 function range(start = 0, end, step = 1, isRight) {
-  let res = [];
+  const res = [];
 
-  const notEmptyArgs = Array.from(arguments).filter(
+  const notEmptyArgs = [...arguments].filter(
     (value) => value !== undefined,
   );
-  let rangeArgsQuantity = isRight
+  const rangeArgsQuantity = isRight
     ? notEmptyArgs.length - 1
     : notEmptyArgs.length;
   if (rangeArgsQuantity === 1) {
@@ -32,13 +32,12 @@ function range(start = 0, end, step = 1, isRight) {
       return;
     }
 
-    let innerStep = step ? step : 1;
+    const innerStep = step || 1;
     if (step === 0) {
       for (let i = start; i <= Math.abs(end - start); i++) {
         res.push(start);
       }
-    } else {
-      if (start < end) {
+    } else if (start < end) {
         for (let i = start; i < end; i += innerStep) {
           res.push(i);
         }
@@ -47,7 +46,6 @@ function range(start = 0, end, step = 1, isRight) {
           res.push(i);
         }
       }
-    }
   }
   if (isRight) {
     res.reverse();

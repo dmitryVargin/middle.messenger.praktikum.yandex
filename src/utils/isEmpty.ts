@@ -1,18 +1,20 @@
-export default function isEmpty(value) {
+function isEmpty(value: any): boolean {
   if (value === null) {
     return true;
   }
   if (typeof value === 'string') {
-    return !value.length;
+    return value.length === 0;
   }
   if (typeof value === 'object') {
     if (value.size !== undefined) {
-      return !value.size;
+      return value.size === 0;
     }
     if (Array.isArray(value)) {
-      return !value.length;
+      return value.length === 0;
     }
-    return !Object.keys(value).length;
+    return Object.keys(value).length === 0;
   }
   return true;
 }
+
+export default isEmpty;
