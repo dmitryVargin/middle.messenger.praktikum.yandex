@@ -37,17 +37,22 @@ const Templator = {
   compileToHtml(tmpl: string, ctx = {}) {
     let innerTmpl = tmpl;
     innerTmpl = this.compilePassEmpty(innerTmpl, ctx);
+    if (ctx.components) {
+      const domParser = new DOMParser();
+      const htmlTmpl = domParser.parseFromString(innerTmpl, 'text/html').body
+        .children[0];
 
-    const domParser = new DOMParser();
-    const htmlTmpl = domParser.parseFromString(innerTmpl, 'text/html').body
-      .children[0];
+      htmlTmpl.querySelectorAll('*').forEach((node) => {
+        if (node.nodeName === 'TEMPLATE') {
+          node.replaceWith(
+            ctx.components[node.content.textContent].getContent(),
+          );
+        }
+      });
+      return htmlTmpl;
+    }
 
-    htmlTmpl.querySelectorAll('*').forEach((node) => {
-      if (node.nodeName === 'TEMPLATE') {
-        node.replaceWith(ctx.components[node.content.textContent]);
-      }
-    });
-    return htmlTmpl;
+    return innerTmpl;
   },
 
   compileConcat(

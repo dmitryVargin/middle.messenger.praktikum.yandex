@@ -1,20 +1,46 @@
 import login from './pages/login/index';
-import chatTmpl from './pages/chat/chat.tmpl';
-import profileTmpl from './pages/profile/profile.tmpl';
-import signupTmpl from './pages/signup/signup.tmpl';
-import errorPageTmpl from './pages/errorPage/errorPage.tmpl';
+// import chatTmpl from './pages/chat/index';
+// import profileTmpl from './pages/profile/index';
+// import signupTmpl from './pages/signup/index';
+// import errorPageTmpl from './pages/errorPage/index';
 import './index.scss';
-import app from './app/index';
+// import app from './app/index';
 
 import render from './utils/renderDom';
+import Button from './components/Button';
+import buttonTmpl from './components/Button/index.tmpl';
+import Block1 from './utils/Block1';
+import Templator from './utils/Templator';
+
+class Button11 extends Block1 {
+  constructor(props) {
+    // Создаём враппер DOM-элемент button
+    super('button', props);
+  }
+
+  render() {
+    // В данном случае render возвращает строкой разметку из шаблонизатора
+    return Templator.compile(buttonTmpl, this.props);
+  }
+}
+const submitButton = new Button11({
+  type: 'button',
+  text: 'Войти',
+  events: {
+    click(event) {
+      console.log(event.target.textContent);
+      event.target.textContent = 123;
+    },
+  },
+});
 
 const routes: {
-  [key: string]: string;
+  [key: string]: HTMLElement;
 } = {
   '/login': login,
-  '/signup': signupTmpl,
-  '/chat': chatTmpl,
-  '/profile': profileTmpl,
+  // '/signup': signupTmpl,
+  // '/chat': chatTmpl,
+  // '/profile': profileTmpl,
 };
 
 const contextMock: {
@@ -71,6 +97,13 @@ const onNavigate = (event: MouseEvent) => {
   setCurrentPage();
 };
 
-console.log(app);
+render('#root', submitButton);
 
-render('#root', app);
+setTimeout(() => {
+  submitButton.setProps({ text: '123' });
+  console.log(submitButton);
+}, 1000);
+setTimeout(() => {
+  submitButton.setProps({ text: '3333' });
+  console.log(submitButton);
+}, 2000);

@@ -1,8 +1,8 @@
-import IBlock from './block';
-
-function render(query: string, block: IBlock): void {
+function render(query, block) {
   const root = document.querySelector(query);
-  root?.append(block);
-}
 
+  // Можно завязаться на реализации вашего класса Block
+  root.append(block.getContent());
+  return root;
+}
 export default render;

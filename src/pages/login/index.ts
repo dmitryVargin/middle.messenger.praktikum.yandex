@@ -3,6 +3,7 @@ import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 
 import Button from '../../components/Button/index';
 import buttonTmpl from '../../components/Button/index.tmpl';
+
 import loginTmpl from './index.tmpl';
 
 import Block from '../../utils/Block';
@@ -13,9 +14,14 @@ const loginInput = new DefaultInput(
     type: 'text',
     name: 'login',
     errorText: 'Неверный логин',
+    events: {
+      click() {
+        console.log(123);
+      },
+    },
   },
   defaultInputTmpl,
-).getContent();
+);
 
 const passwordInput = new DefaultInput(
   {
@@ -24,26 +30,27 @@ const passwordInput = new DefaultInput(
     name: 'password',
     errorText: 'Неверный логин',
     events: {
-      change: (event) => {
+      change(event) {
         console.log(event.target.value);
       },
     },
   },
   defaultInputTmpl,
-).getContent();
+);
 
 const submitButton = new Button(
   {
     type: 'button',
     text: 'Войти',
     events: {
-      click: () => {
-        console.log(123);
+      click(event) {
+        console.log(event.target.textContent);
+        event.target.textContent = 123;
       },
     },
   },
   buttonTmpl,
-).getContent();
+);
 
 const propsToEl = {
   components: {
@@ -53,11 +60,7 @@ const propsToEl = {
   },
 };
 
-class Login extends Block {
-  constructor(props, tmpl) {
-    super('div', props, tmpl);
-  }
-}
+class Login extends Block {}
 
-const login = new Login(propsToEl, loginTmpl).getContent();
+const login = new Login(propsToEl, loginTmpl);
 export default login;

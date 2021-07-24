@@ -1,9 +1,5 @@
 import Block, { Props } from '../../utils/Block';
 
-class Button extends Block {
-  constructor(props: Props, tmpl?: string) {
-    super('div', props, tmpl);
-  }
-}
+class Button extends Block {}
 
 export default Button;

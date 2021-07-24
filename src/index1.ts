@@ -1,53 +1,46 @@
 import { v4 as makeUUID } from 'uuid';
-import EventBus from './EventBus';
-import Templator from './Templator';
+import Block from './utils/Block';
+import Templator from './utils/Templator';
+import buttonTmpl from './components/Button/index.tmpl';
 
-type Element = HTMLElement;
-export type Props = Record<string, any>;
-type Meta = {
-  tagName: string;
-  props: Props;
-};
+type CallbackArgs = any[];
+type Callback = (...args: CallbackArgs) => void;
+type Event = string;
 
-interface IBlock {
-  _element: Element;
-  props: Props;
-  eventBus: () => EventBus;
-  setProps: (nextProps: Props) => void;
-  readonly element: HTMLElement;
+class EventBus {
+  private listeners: {
+    [keyof: string]: Callback[];
+  };
 
-  _registerEvents(eventBus: EventBus): void;
+  constructor() {
+    this.listeners = {};
+  }
 
-  _createResources(): void;
+  on(event: Event, callback: Callback) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  }
 
-  init(): void;
+  off(event: Event, callback: Callback) {
+    this.listeners[event] = this.listeners[event].filter(
+      (listener) => listener !== callback,
+    );
+  }
 
-  _componentDidMount(): void;
-
-  componentDidMount(oldProps: Props): void;
-
-  _componentDidUpdate(oldProps: Props, newProps: Props): void;
-
-  componentDidUpdate(oldProps: Props, newProps: Props): boolean;
-
-  _render(): void;
-
-  render(): Element;
-
-  getContent(): Element;
-
-  checkPrivateProp(prop: string): boolean;
-
-  _makePropsProxy(props: Props): Props;
-
-  _createDocumentElement(tagName: string): HTMLElement;
-
-  show(): void;
-
-  hide(): void;
+  emit(event: Event, ...callbackArgs: CallbackArgs) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((listener) => {
+        listener(...callbackArgs);
+      });
+    } else {
+      throw new Error(`Нет события: ${event}`);
+    }
+  }
 }
 
-class Block implements IBlock {
+class Block1 {
   static EVENTS = {
     INIT: 'init',
     FLOW_CDM: 'flow:component-did-mount',
@@ -55,18 +48,17 @@ class Block implements IBlock {
     FLOW_RENDER: 'flow:render',
   };
 
-  _element: Element;
+  _element = null;
 
-  props: Props;
+  _meta = null;
 
-  tmpl: string;
-
-  eventBus: () => EventBus;
-
-  private _id: any;
-
+  /** JSDoc
+   * @param {string} tagName
+   * @param {Object} props
+   *
+   * @returns {void}
+   */
   constructor(tagName = 'div', props = {}) {
-    this._id = makeUUID();
     const eventBus = new EventBus();
     this._meta = {
       tagName,
@@ -79,22 +71,6 @@ class Block implements IBlock {
 
     this._registerEvents(eventBus);
     eventBus.emit(Block.EVENTS.INIT);
-  }
-
-  private _removeEvents(): void {
-    const { events = {} } = this.props;
-
-    Object.keys(events).forEach((eventName) => {
-      this.element.removeEventListener(eventName, events[eventName].bind(this));
-    });
-  }
-
-  _addEvents() {
-    const { events = {} } = this.props;
-    Object.keys(events).forEach((eventName) => {
-      const callback = events[eventName].bind(this);
-      this._element.firstElementChild.addEventListener(eventName, callback);
-    });
   }
 
   _registerEvents(eventBus) {
@@ -188,18 +164,45 @@ class Block implements IBlock {
 
   _render() {
     const block = this.render();
-
-    this._removeEvents();
-    console.log(this._element.innerHTML);
-    this._element.append(block);
-
-    // if (this._id !== null) {
-    //   this._element.firstElementChild.dataset.id = this._id;
-    // }
-    this._addEvents();
+    // Этот небезопасный метод для упрощения логики
+    // Используйте шаблонизатор из npm или напиши свой безопасный
+    // Нужно не в строку компилировать (или делать это правильно),
+    // либо сразу в DOM-элементы превращать из возвращать из compile DOM-ноду
+    this._element.innerHTML = block;
   }
 
   render() {}
 }
 
-export default Block;
+class Button extends Block {
+  constructor(props) {
+    // Создаём враппер дом-элемент button
+    super('button', props);
+  }
+
+  render() {
+    return Templator.compileToHtml(this.props, buttonTmpl);
+    // В проекте должен быть ваш собственный шаблонизатор
+    return `<div>${this.props.text}</div>`;
+  }
+}
+
+function render(query, block) {
+  const root = document.querySelector(query);
+  root.append(block.getContent());
+  return root;
+}
+
+const button = new Button({
+  text: 'Click me',
+});
+
+// app — это id дива в корне DOM
+render('#root', button);
+
+// Через секунду контент изменится сам, достаточно обновить пропсы
+setTimeout(() => {
+  button.setProps({
+    text: 'Click me, please',
+  });
+}, 1000);
