@@ -1,8 +1,8 @@
-function render(query, block) {
-  const root = document.querySelector(query);
+import Block from './Block';
 
-  // Можно завязаться на реализации вашего класса Block
+function render(query: string, block: Block): void {
+  const root = document.querySelector(query) as HTMLElement;
   root.append(block.getContent());
-  return root;
 }
+
 export default render;

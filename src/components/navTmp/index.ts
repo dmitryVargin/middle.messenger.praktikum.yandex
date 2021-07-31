@@ -1,4 +1,3 @@
-import navTmpTmpl from './index.tmpl';
-import Block, { Props } from '../../utils/Block';
+import Block from '../../utils/Block';
 
-export default class NavTmp extends Block {}
+export class NavTmp extends Block {}

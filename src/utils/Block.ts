@@ -2,126 +2,159 @@ import { v4 as makeUUID } from 'uuid';
 import EventBus from './EventBus';
 import Templator from './Templator';
 
-type Element = HTMLElement;
-export type Props = Record<string, any>;
-type Meta = {
-  tagName: string;
-  props: Props;
-};
-
-interface IBlock {
-  _element: Element;
-  props: Props;
-  eventBus: () => EventBus;
-  setProps: (nextProps: Props) => void;
-  readonly element: HTMLElement;
-
-  _registerEvents(eventBus: EventBus): void;
-
-  _createResources(): void;
-
-  init(): void;
-
-  _componentDidMount(): void;
-
-  componentDidMount(oldProps: Props): void;
-
-  _componentDidUpdate(oldProps: Props, newProps: Props): void;
-
-  componentDidUpdate(oldProps: Props, newProps: Props): boolean;
-
-  _render(): void;
-
-  render(): Element;
-
-  getContent(): Element;
-
-  checkPrivateProp(prop: string): boolean;
-
-  _makePropsProxy(props: Props): Props;
-
-  _createDocumentElement(tagName: string): HTMLElement;
-
-  show(): void;
-
-  hide(): void;
+enum EVENTS {
+  INIT = 'init',
+  FLOW_CDM = 'flow:component-did-mount',
+  FLOW_CDU = 'flow:component-did-update',
+  FLOW_RENDER = 'flow:render',
 }
 
-class Block implements IBlock {
-  static EVENTS = {
-    INIT: 'init',
-    FLOW_CDM: 'flow:component-did-mount',
-    FLOW_CDU: 'flow:component-did-update',
-    FLOW_RENDER: 'flow:render',
-  };
+type ClassName = {
+  type: 'add' | 'remove';
+  value: string;
+};
+type Attribute = {
+  type: 'set' | 'remove';
+  value?: string;
+};
+type Attributes = {
+  element: string;
+  className?: ClassName;
+  [key: string]: Attribute | string | ClassName | undefined;
+};
 
-  _element: Element;
+type PropsEvent = {
+  type: string;
+  element: string;
+  callback: (event: Event) => void;
+};
+export type Props = {
+  withInternalId?: boolean;
+  events?: PropsEvent[];
+  attributes?: Attributes[];
+  components?: { [key: string]: any };
+  [key: string]: any;
+};
 
-  props: Props;
-
+interface IMeta {
   tmpl: string;
+  props: Props;
+}
 
-  eventBus: () => EventBus;
+class Block {
+  public props: Props;
 
-  private _id: any;
+  protected _meta: IMeta;
 
-  constructor(tagName = 'div', props = {}) {
-    this._id = makeUUID();
-    const eventBus = new EventBus();
+  protected eventBus: EventBus;
+
+  private readonly _id: string | undefined;
+
+  private _boundEvents: PropsEvent[];
+
+  constructor(props = {}, tmpl: string) {
+    this._boundEvents = [];
+    this.eventBus = new EventBus();
     this._meta = {
-      tagName,
+      tmpl,
       props,
     };
-
     this.props = this._makePropsProxy({ ...props, __id: this._id });
-
-    this.eventBus = () => eventBus;
-
-    this._registerEvents(eventBus);
-    eventBus.emit(Block.EVENTS.INIT);
+    if (this.props.withInternalId) {
+      this._id = makeUUID();
+    }
+    this._registerEvents();
+    this.eventBus.emit(EVENTS.INIT);
   }
 
-  private _removeEvents(): void {
-    const { events = {} } = this.props;
+  protected _element!: HTMLElement;
 
-    Object.keys(events).forEach((eventName) => {
-      this.element.removeEventListener(eventName, events[eventName].bind(this));
-    });
+  protected get element(): HTMLElement {
+    return this._element;
   }
 
-  _addEvents() {
-    const { events = {} } = this.props;
-    Object.keys(events).forEach((eventName) => {
-      const callback = events[eventName].bind(this);
-      this._element.firstElementChild.addEventListener(eventName, callback);
-    });
+  destroyElem(): void {
+    this.element.remove();
   }
 
-  _registerEvents(eventBus) {
-    eventBus.on(Block.EVENTS.INIT, this.init.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_RENDER, this._render.bind(this));
+  getContent(): HTMLElement {
+    return this.element;
   }
 
-  _createResources() {
-    const { tagName } = this._meta;
-    this._element = this._createDocumentElement(tagName);
+  setProps = (nextProps: Props): void => {
+    if (!nextProps) {
+      return;
+    }
+    Object.assign(this.props, { ...nextProps });
+  };
+
+  render(): HTMLCollection {
+    return Templator.getCompiledChildren(this._meta.tmpl, this.props);
   }
 
-  init() {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  componentDidMount() {}
+
+  protected init(): void {
     this._createResources();
-    this.eventBus().emit(Block.EVENTS.FLOW_CDM);
+    this.eventBus.emit(EVENTS.FLOW_CDM);
   }
 
-  _componentDidMount() {
+  protected componentDidUpdate(oldProps?: Props, newProps?: Props): boolean {
+    return oldProps !== newProps;
+  }
+
+  protected show(): void {
+    this.getContent().classList.remove('hidden');
+  }
+
+  protected hide(): void {
+    this.getContent().classList.add('hidden');
+  }
+
+  private _registerEvents(): void {
+    this.eventBus.on(EVENTS.INIT, this.init.bind(this));
+    this.eventBus.on(EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
+    this.eventBus.on(EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+    this.eventBus.on(EVENTS.FLOW_RENDER, this._render.bind(this));
+  }
+
+  private _createResources(): void {
+    const element = Templator.getCompiledParent(this._meta.tmpl, this.props) as HTMLElement;
+
+    if (this._id) {
+      element.dataset.id = this._id;
+    }
+    this._element = element;
+  }
+
+  private _makePropsProxy<T>(target: Record<string, T>): Props {
+    return new Proxy(target, {
+      get: (target, prop: string): T => {
+        const value = target[prop];
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+      set: (target, prop: string, value: T) => {
+        if (typeof target[prop] === 'object') {
+          Object.assign(target[prop], value);
+        } else {
+          target[prop] = value;
+        }
+        this.eventBus.emit(EVENTS.FLOW_CDU, { ...target }, target);
+        return true;
+      },
+      deleteProperty: () => {
+        throw new Error('Нет доступа');
+      },
+    });
+  }
+
+  private _componentDidMount(): void {
     this.componentDidMount();
-    this.eventBus().emit(Block.EVENTS.FLOW_RENDER);
+    this.eventBus.emit(EVENTS.FLOW_RENDER);
   }
 
-  componentDidMount(oldProps) {}
-
-  _componentDidUpdate(oldProps, newProps) {
+  private _componentDidUpdate(oldProps?: Props, newProps?: Props) {
     const response = this.componentDidUpdate(oldProps, newProps);
     if (!response) {
       return;
@@ -129,77 +162,96 @@ class Block implements IBlock {
     this._render();
   }
 
-  componentDidUpdate(oldProps, newProps) {
-    return true;
-  }
-
-  setProps = (nextProps) => {
-    if (!nextProps) {
-      return;
-    }
-
-    Object.assign(this.props, nextProps);
-  };
-
-  get element() {
-    return this._element;
-  }
-
-  getContent() {
-    return this.element;
-  }
-
-  _makePropsProxy(props) {
-    // Можно и так передать this
-    // Такой способ больше не применяется с приходом ES6+
-    const self = this;
-
-    return new Proxy(props, {
-      get(target, prop) {
-        const value = target[prop];
-        return typeof value === 'function' ? value.bind(target) : value;
-      },
-      set(target, prop, value) {
-        target[prop] = value;
-
-        // Запускаем обновление компоненты
-        // Плохой cloneDeep, в след итерации нужно заставлять добавлять cloneDeep им самим
-        self.eventBus().emit(Block.EVENTS.FLOW_CDU, { ...target }, target);
-        return true;
-      },
-      deleteProperty() {
-        throw new Error('Нет доступа');
-      },
+  private addEvents(): void {
+    const events = this._boundEvents;
+    events.forEach(({ type, element, callback }) => {
+      if (element) {
+        if (element === 'root') {
+          const innerEl = this.element;
+          innerEl.addEventListener(type, callback);
+        } else {
+          const innerEl = this.element.querySelectorAll(element);
+          innerEl.forEach((el) => {
+            el.addEventListener(type, callback);
+          });
+        }
+      }
     });
   }
 
-  _createDocumentElement(tagName) {
-    // Можно сделать метод, который через фрагменты в цикле создает сразу несколько блоков
-    return document.createElement(tagName);
+  private removeEvents(): void {
+    const events = this._boundEvents;
+
+    events.forEach(({ type, element, callback }) => {
+      if (element) {
+        let innerEl;
+        if (element === 'root') {
+          innerEl = this.element;
+        } else {
+          innerEl = this.element.querySelector(element) as HTMLElement;
+        }
+        innerEl.removeEventListener(type, callback);
+      }
+    });
+
+    if (this.props.events) {
+      this._boundEvents = [];
+      this.props.events.forEach(({ type, element, callback }) => {
+        this._boundEvents.push({
+          type,
+          element,
+          callback: callback.bind(this),
+        });
+      });
+    }
   }
 
-  show() {
-    this.getContent().style.display = 'block';
+  private setAttributes(el: Element): Element {
+    if (this.props.attributes !== undefined) {
+      this.props.attributes.forEach((obj: Attributes) => {
+        let innerEl = el;
+        if (obj.element !== 'root') {
+          innerEl = el.querySelector(obj.element) as HTMLElement;
+        }
+        if (innerEl !== null) {
+          Object.keys(obj).forEach((key) => {
+            if (key !== 'element') {
+              if (key === 'className') {
+                const type = obj[key]?.type;
+                const value = obj[key]?.value;
+                if (type !== undefined && value !== undefined) {
+                  innerEl.classList[type](value);
+                }
+              } else {
+                const attribute = obj[key] as Attribute;
+                const { type } = attribute;
+                const { value } = attribute;
+                if (type === 'set') {
+                  innerEl.setAttribute(key, <string>value);
+                } else if (type === 'remove') {
+                  innerEl.removeAttribute(key);
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+
+    return el;
   }
 
-  hide() {
-    this.getContent().style.display = 'none';
-  }
-
-  _render() {
+  private _render(): void {
     const block = this.render();
 
-    this._removeEvents();
-    console.log(this._element.innerHTML);
-    this._element.append(block);
-
-    // if (this._id !== null) {
-    //   this._element.firstElementChild.dataset.id = this._id;
-    // }
-    this._addEvents();
+    if (block.length) {
+      this._element.innerHTML = '';
+      this._element.append(...block);
+    }
+    this.removeEvents();
+    this.setAttributes(this._element);
+    this.addEvents();
   }
-
-  render() {}
 }
 
 export default Block;

@@ -1,15 +1,5 @@
-import arrowButtonTmpl from './index.tmpl';
-import Block, { Props } from '../../utils/block';
-import Templator from '../../utils/Templator';
+import Block from '../../utils/Block';
 
-class ArrowButton extends Block {
-  constructor(props: Props) {
-    super('div', props);
-  }
-
-  render(): string {
-    return Templator.compile(arrowButtonTmpl, this.props);
-  }
-}
+class ArrowButton extends Block {}
 
 export default ArrowButton;

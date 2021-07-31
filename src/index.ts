@@ -1,109 +1,116 @@
-import login from './pages/login/index';
-// import chatTmpl from './pages/chat/index';
-// import profileTmpl from './pages/profile/index';
-// import signupTmpl from './pages/signup/index';
-// import errorPageTmpl from './pages/errorPage/index';
+import { Login, loginProps } from './pages/login';
+import loginTmpl from './pages/login/index.tmpl';
+
+import { Signup, signupProps } from './pages/signup';
+import signupTmpl from './pages/signup/index.tmpl';
+
+import { Profile, profileProps } from './pages/profile';
+import profileTmpl from './pages/profile/index.tmpl';
+
+import { Chat, chatProps } from './pages/chat';
+import chatTmpl from './pages/chat/index.tmpl';
+
+import { NavTmp } from './components/navTmp';
+import navTmpTmpl from './components/navTmp/index.tmpl';
+
+import { App } from './app';
+import appTmpl from './app/index.tmpl';
+
+import ErrorPage from './pages/errorPage';
+import errorPageTmpl from './pages/errorPage/index.tmpl';
+
 import './index.scss';
-// import app from './app/index';
-
+import Block, { Props } from './utils/Block';
 import render from './utils/renderDom';
-import Button from './components/Button';
-import buttonTmpl from './components/Button/index.tmpl';
-import Block1 from './utils/Block1';
-import Templator from './utils/Templator';
+import historyPush from './utils/historyPush';
 
-class Button11 extends Block1 {
-  constructor(props) {
-    // Создаём враппер DOM-элемент button
-    super('button', props);
-  }
-
-  render() {
-    // В данном случае render возвращает строкой разметку из шаблонизатора
-    return Templator.compile(buttonTmpl, this.props);
-  }
-}
-const submitButton = new Button11({
-  type: 'button',
-  text: 'Войти',
-  events: {
-    click(event) {
-      console.log(event.target.textContent);
-      event.target.textContent = 123;
-    },
-  },
-});
-
-const routes: {
-  [key: string]: HTMLElement;
-} = {
-  '/login': login,
-  // '/signup': signupTmpl,
-  // '/chat': chatTmpl,
-  // '/profile': profileTmpl,
-};
-
-const contextMock: {
-  userData: {
-    id: number;
-    first_name: string;
-    second_name: string;
-    display_name: string;
-    login: string;
-    email: string;
-    phone: string;
-    avatar: string;
+const routesToElem: {
+  [key: string]: {
+    Class: typeof Block;
+    props: Props;
+    value: Block | null;
+    tmpl: string;
   };
-  [key: string]: any;
 } = {
-  // userData: {
-  //   id: 0,
-  //   first_name: 'Petya',
-  //   second_name: 'Pupkin',
-  //   display_name: 'Petya Pupkin',
-  //   login: 'userLogin',
-  //   email: 'my@email.com',
-  //   phone: '89223332211',
-  //   avatar: emptyAvatar,
-  // },
+  '/login': {
+    Class: Login,
+    props: loginProps,
+    value: null,
+    tmpl: loginTmpl,
+  },
+  '/signup': {
+    Class: Signup,
+    props: signupProps,
+    value: null,
+    tmpl: signupTmpl,
+  },
+  '/chat': {
+    Class: Chat,
+    props: chatProps,
+    value: null,
+    tmpl: chatTmpl,
+  },
+  '/profile': {
+    Class: Profile,
+    props: profileProps,
+    value: null,
+    tmpl: profileTmpl,
+  },
 };
 
-function setCurrentPage() {
-  const routeExist = routes[window.location.pathname] !== undefined;
-
+export function getCurrentPage(): Block {
+  const routeExist = routesToElem[window.location.pathname] !== undefined;
   let currentPage;
   if (routeExist) {
-    currentPage = routes[window.location.pathname];
+    const currentPageObj = routesToElem[window.location.pathname];
+    const isComponentInit = !!currentPageObj.value;
+    if (!isComponentInit) {
+      currentPageObj.value = new currentPageObj.Class(
+        currentPageObj.props,
+        currentPageObj.tmpl,
+      );
+    }
+    currentPage = currentPageObj.value as Block;
   } else {
-    currentPage = errorPageTmpl;
-    contextMock.error = {
-      code: '404',
-      message: 'Страница не существует',
-    };
+    currentPage = new ErrorPage(
+      {
+        error: {
+          code: '404',
+          message: 'Страница не существует',
+        },
+      },
+      errorPageTmpl,
+    );
   }
-
-  app.setProps({ page: currentPage });
+  return currentPage;
 }
 
-const onNavigate = (event: MouseEvent) => {
-  if (!(event.target instanceof HTMLAnchorElement)) {
-    return;
-  }
-  const { path } = event.target.dataset;
-  if (typeof path === 'string') {
-    window.history.pushState({}, path, `${window.location.origin}${path}`);
-  }
-
-  setCurrentPage();
+const app = new App(
+  {
+    components: {
+      navTmp: new NavTmp(
+        {
+          events: [
+            {
+              type: 'click',
+              element: '[data-path]',
+              callback(event: MouseEvent) {
+                historyPush(event, () => {
+                  app.setProps({ components: { page: getCurrentPage() } });
+                });
+              },
+            },
+          ],
+        },
+        navTmpTmpl,
+      ),
+      page: getCurrentPage(),
+    },
+  },
+  appTmpl,
+);
+export const appRerender = (): void => {
+  app.setProps({ components: { page: getCurrentPage() } });
 };
 
-render('#root', submitButton);
-
-setTimeout(() => {
-  submitButton.setProps({ text: '123' });
-  console.log(submitButton);
-}, 1000);
-setTimeout(() => {
-  submitButton.setProps({ text: '3333' });
-  console.log(submitButton);
-}, 2000);
+render('#root', app);

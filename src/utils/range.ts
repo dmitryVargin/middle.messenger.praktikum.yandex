@@ -1,12 +1,8 @@
-function range(start = 0, end, step = 1, isRight) {
-  const res = [];
+function range(start = 0, end: number, step = 1, isRight: boolean): number[] | undefined {
+  const res: number[] = [];
 
-  const notEmptyArgs = [...arguments].filter(
-    (value) => value !== undefined,
-  );
-  const rangeArgsQuantity = isRight
-    ? notEmptyArgs.length - 1
-    : notEmptyArgs.length;
+  const notEmptyArgs = [...arguments].filter((value) => value !== undefined);
+  const rangeArgsQuantity = isRight ? notEmptyArgs.length - 1 : notEmptyArgs.length;
   if (rangeArgsQuantity === 1) {
     if (typeof start !== 'number') {
       return;
@@ -24,11 +20,7 @@ function range(start = 0, end, step = 1, isRight) {
       }
     }
   } else {
-    if (
-      typeof start !== 'number' ||
-      typeof end !== 'number' ||
-      typeof step !== 'number'
-    ) {
+    if (typeof start !== 'number' || typeof end !== 'number' || typeof step !== 'number') {
       return;
     }
 
@@ -38,14 +30,14 @@ function range(start = 0, end, step = 1, isRight) {
         res.push(start);
       }
     } else if (start < end) {
-        for (let i = start; i < end; i += innerStep) {
-          res.push(i);
-        }
-      } else {
-        for (let i = start; i > end; i -= Math.abs(innerStep)) {
-          res.push(i);
-        }
+      for (let i = start; i < end; i += innerStep) {
+        res.push(i);
       }
+    } else {
+      for (let i = start; i > end; i -= Math.abs(innerStep)) {
+        res.push(i);
+      }
+    }
   }
   if (isRight) {
     res.reverse();
@@ -53,6 +45,6 @@ function range(start = 0, end, step = 1, isRight) {
   return res;
 }
 
-function rangeRight(start, end, step) {
+function rangeRight(start: number, end: number, step: number) {
   return range(start, end, step, true);
 }

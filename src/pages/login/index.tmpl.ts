@@ -1,10 +1,10 @@
 export default `
-  <div data-qwe="{{qwe}}" class="form login-wrap">
-    <h1>Вход</h1>
+  <div class='form login-wrap'>
+    <h1>Log in</h1>
     <form>
-    <template>loginInput</template>
-    <template>passwordInput</template>
-    <template>submitButton</template>
+    <div data-component='loginInput'></div>
+    <div data-component='passwordInput'></div>
+    <div data-component='submitButton'></div>
     </form>
-    <a class="link">Нет аккаунта?</a>
+    <div class='pre-link'>Don't have an account? <a data-path='/signup' class='link'> Sign up</a></div>
   </div>`;

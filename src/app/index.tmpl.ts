@@ -1,7 +1,7 @@
 export default `
    <main class='app'>
-     <template>navTmp</template>
-     <div class="page">
-     <template>page</template>
+     <div data-component='navTmp'></div>
+     <div class='page'>
+     <div data-component='page'></div>
      </div>
    </main>`;

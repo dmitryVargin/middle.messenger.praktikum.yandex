@@ -4,63 +4,114 @@ import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Button from '../../components/Button/index';
 import buttonTmpl from '../../components/Button/index.tmpl';
 
-import loginTmpl from './index.tmpl';
+import { Props } from '../../utils/Block';
+import Validation from '../../utils/Validation';
 
-import Block from '../../utils/Block';
+import Form from '../../modules/Form';
+import historyPush from '../../utils/historyPush';
+import { appRerender } from '../../index';
 
 const loginInput = new DefaultInput(
   {
-    label: 'Логин',
+    label: 'Login',
     type: 'text',
     name: 'login',
-    errorText: 'Неверный логин',
-    events: {
-      click() {
-        console.log(123);
+    errorText: 'Wrong login',
+    events: [
+      {
+        type: 'blur',
+        element: 'input',
+        callback(event: InputEvent) {
+          const target = event.target as HTMLInputElement;
+          const { isValid } = new Validation(target.value).minLength(4);
+          if (!isValid) {
+            loginInput.setValidError();
+          } else {
+            loginInput.setValid();
+          }
+        },
       },
-    },
+    ],
   },
   defaultInputTmpl,
 );
 
 const passwordInput = new DefaultInput(
   {
-    label: 'Пароль',
+    label: 'Password',
     type: 'password',
     name: 'password',
-    errorText: 'Неверный логин',
-    events: {
-      change(event) {
-        console.log(event.target.value);
+    errorText: 'Wrong password',
+    events: [
+      {
+        type: 'blur',
+        element: 'input',
+        callback(event: InputEvent): void {
+          const target = event.target as HTMLInputElement;
+          const validation = new Validation(target.value);
+          const { isValid } = validation.minLength(6).lettersOrNumbers();
+          if (!isValid) {
+            passwordInput.setValidError();
+          } else {
+            passwordInput.setValid();
+          }
+        },
       },
-    },
+    ],
   },
   defaultInputTmpl,
 );
 
-const submitButton = new Button(
+export const submitButton = new Button(
   {
-    type: 'button',
-    text: 'Войти',
-    events: {
-      click(event) {
-        console.log(event.target.textContent);
-        event.target.textContent = 123;
+    attributes: [
+      {
+        element: 'root',
+        disabled: {
+          type: 'set',
+          value: true,
+        },
+        className: {
+          type: 'add',
+          value: 'disabled',
+        },
       },
-    },
+    ],
+    type: 'submit',
+    text: 'Login',
   },
   buttonTmpl,
 );
 
-const propsToEl = {
+export class Login extends Form {}
+
+export const loginProps: Props = {
+  events: [
+    {
+      type: 'submit',
+      element: 'form',
+      callback(event: Event): void {
+        event.preventDefault();
+        const formData = new FormData(event.target as HTMLFormElement);
+        const formDataObj: Record<string, any> = {};
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [name, value] of formData) {
+          formDataObj[name] = value;
+        }
+        console.log(formDataObj);
+      },
+    },
+    {
+      type: 'click',
+      element: '[data-path]',
+      callback(event: Event): void {
+        historyPush(event, appRerender);
+      },
+    },
+  ],
   components: {
     loginInput,
     passwordInput,
     submitButton,
   },
 };
-
-class Login extends Block {}
-
-const login = new Login(propsToEl, loginTmpl);
-export default login;
