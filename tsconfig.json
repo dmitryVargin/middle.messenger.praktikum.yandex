@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": [
     "node_modules"

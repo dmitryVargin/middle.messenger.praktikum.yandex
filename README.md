@@ -10,6 +10,8 @@ Netlify https://adoring-morse-4ee1ae.netlify.app/
 
 Билд: npm run build
 
+По неизвестной пока причине билд не работает с ошибкой "require is not defined"
+
 Создано временное навигационное меню.
 
 Попапы готовы частично.
