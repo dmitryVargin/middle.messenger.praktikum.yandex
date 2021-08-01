@@ -84,7 +84,13 @@ class HTTPTransport {
       });
 
       xhr.onload = () => {
-        resolve(xhr);
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr);
+        } else if (xhr.status >= 400 && xhr.status < 500) {
+          reject(xhr);
+        } else {
+          // something else
+        }
       };
 
       xhr.onabort = reject;
