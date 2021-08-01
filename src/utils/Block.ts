@@ -1,4 +1,3 @@
-import { v4 as makeUUID } from 'uuid';
 import EventBus from './EventBus';
 import Templator from './Templator';
 
@@ -48,8 +47,6 @@ class Block {
 
   protected eventBus: EventBus;
 
-  private readonly _id: string | undefined;
-
   private _boundEvents: PropsEvent[];
 
   constructor(props = {}, tmpl: string) {
@@ -59,10 +56,8 @@ class Block {
       tmpl,
       props,
     };
-    this.props = this._makePropsProxy({ ...props, __id: this._id });
-    if (this.props.withInternalId) {
-      this._id = makeUUID();
-    }
+    this.props = this._makePropsProxy({ ...props });
+
     this._registerEvents();
     this.eventBus.emit(EVENTS.INIT);
   }
@@ -85,6 +80,7 @@ class Block {
     if (!nextProps) {
       return;
     }
+
     Object.assign(this.props, { ...nextProps });
   };
 
@@ -122,9 +118,6 @@ class Block {
   private _createResources(): void {
     const element = Templator.getCompiledParent(this._meta.tmpl, this.props) as HTMLElement;
 
-    if (this._id) {
-      element.dataset.id = this._id;
-    }
     this._element = element;
   }
 
@@ -165,16 +158,17 @@ class Block {
   private addEvents(): void {
     const events = this._boundEvents;
     events.forEach(({ type, element, callback }) => {
-      if (element) {
-        if (element === 'root') {
-          const innerEl = this.element;
-          innerEl.addEventListener(type, callback);
-        } else {
-          const innerEl = this.element.querySelectorAll(element);
-          innerEl.forEach((el) => {
-            el.addEventListener(type, callback);
-          });
-        }
+      if (!element) {
+        return;
+      }
+      if (element === 'root') {
+        const innerEl = this.element;
+        innerEl.addEventListener(type, callback);
+      } else {
+        const innerEl = this.element.querySelectorAll(element);
+        innerEl.forEach((el) => {
+          el.addEventListener(type, callback);
+        });
       }
     });
   }
@@ -183,60 +177,70 @@ class Block {
     const events = this._boundEvents;
 
     events.forEach(({ type, element, callback }) => {
-      if (element) {
-        let innerEl;
-        if (element === 'root') {
-          innerEl = this.element;
-        } else {
-          innerEl = this.element.querySelector(element) as HTMLElement;
-        }
-        innerEl.removeEventListener(type, callback);
+      if (!element) {
+        return;
       }
+
+      let innerEl;
+      if (element === 'root') {
+        innerEl = this.element;
+      } else {
+        innerEl = this.element.querySelector(element) as HTMLElement;
+      }
+      innerEl.removeEventListener(type, callback);
     });
 
-    if (this.props.events) {
-      this._boundEvents = [];
-      this.props.events.forEach(({ type, element, callback }) => {
-        this._boundEvents.push({
-          type,
-          element,
-          callback: callback.bind(this),
-        });
-      });
+    if (!this.props.events) {
+      return;
     }
+
+    this._boundEvents = [];
+    this.props.events.forEach(({ type, element, callback }) => {
+      this._boundEvents.push({
+        type,
+        element,
+        callback: callback.bind(this),
+      });
+    });
   }
 
   private setAttributes(el: Element): Element {
-    if (this.props.attributes !== undefined) {
-      this.props.attributes.forEach((obj: Attributes) => {
-        let innerEl = el;
-        if (obj.element !== 'root') {
-          innerEl = el.querySelector(obj.element) as HTMLElement;
+    if (this.props.attributes === undefined) {
+      return;
+    }
+
+    this.props.attributes.forEach((obj: Attributes) => {
+      let innerEl = el;
+      if (obj.element !== 'root') {
+        innerEl = el.querySelector(obj.element) as HTMLElement;
+      }
+
+      if (innerEl === null) {
+        return;
+      }
+
+      Object.keys(obj).forEach((key) => {
+        if (key === 'element') {
+          return;
         }
-        if (innerEl !== null) {
-          Object.keys(obj).forEach((key) => {
-            if (key !== 'element') {
-              if (key === 'className') {
-                const type = obj[key]?.type;
-                const value = obj[key]?.value;
-                if (type !== undefined && value !== undefined) {
-                  innerEl.classList[type](value);
-                }
-              } else {
-                const attribute = obj[key] as Attribute;
-                const { type } = attribute;
-                const { value } = attribute;
-                if (type === 'set') {
-                  innerEl.setAttribute(key, <string>value);
-                } else if (type === 'remove') {
-                  innerEl.removeAttribute(key);
-                }
-              }
-            }
-          });
+
+        if (key === 'className') {
+          const type = obj[key]?.type;
+          const value = obj[key]?.value;
+          if (type !== undefined && value !== undefined) {
+            innerEl.classList[type](value);
+          }
+        } else {
+          const attribute = obj[key] as Attribute;
+          const { type, value } = attribute;
+          if (type === 'set') {
+            innerEl.setAttribute(key, <string>value);
+          } else if (type === 'remove') {
+            innerEl.removeAttribute(key);
+          }
         }
       });
-    }
+    });
 
     return el;
   }

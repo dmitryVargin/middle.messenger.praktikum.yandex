@@ -83,12 +83,12 @@ class HTTPTransport {
         xhr.setRequestHeader(key, headers[key]);
       });
 
-      xhr.addEventListener('load', () => {
+      xhr.onload = () => {
         resolve(xhr);
-      });
+      };
 
-      xhr.addEventListener('abort', reject);
-      xhr.addEventListener('error', reject);
+      xhr.onabort = reject;
+      xhr.onerror = reject;
 
       xhr.timeout = timeout;
       xhr.ontimeout = reject;

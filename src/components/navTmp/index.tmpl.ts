@@ -5,5 +5,6 @@ export default `
       <li><a data-path='/signup' class='link'>signup</a></li>
       <li><a data-path='/profile' class='link'>profile</a></li>
       <li><a data-path='/errorPage' class='link'>errorPage</a></li>
-      <li><a data-path='/chat' class='link'>chat</a></li></ul>
+      <li><a data-path='/chat' class='link'>chat</a></li>
+    </ul>
   </nav>`;

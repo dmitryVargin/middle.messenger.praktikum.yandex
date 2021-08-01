@@ -17,9 +17,9 @@ type MessageObj = {
   isOwn: boolean;
 };
 const messageTmpl = ({ messageId, message, time, isOwn }: MessageObj): string => {
-  const isOtherClass = !isOwn ? 'other' : 'own';
+  const messageOwner = isOwn ? 'own' : 'other';
   return `
-  <div data-id='${messageId}' class='message ${isOtherClass}'>
+  <div data-id='${messageId}' class='message ${messageOwner}'>
     <p class='text'>
     ${message}
     </p>

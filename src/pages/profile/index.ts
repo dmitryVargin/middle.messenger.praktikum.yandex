@@ -4,7 +4,7 @@ import Block from '../../utils/Block';
 import historyPush from '../../utils/historyPush';
 import { appRerender } from '../../index';
 import EditFieldPopup from '../../components/popups/EditFieldPopup';
-import editFieldPopupTmpl from '../../components/popups/EditFieldPopup/index,tmpl';
+import editFieldPopupTmpl from '../../components/popups/EditFieldPopup/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Button from '../../components/Button';

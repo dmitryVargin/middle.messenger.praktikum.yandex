@@ -1,7 +1,7 @@
 export default `
   <div class='profile-wrap'>
     <div class='sidebar'>
-    <div data-component='arrowBtn'></div>
+      <div data-component='arrowBtn'></div>
     </div>
     <div class='profile'>
       <div class='img-wrap'>
