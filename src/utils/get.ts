@@ -1,8 +1,8 @@
-interface INestedObj {
-  [key: string]: INestedObj | any;
-}
+type Indexed<T = unknown> = {
+  [key in string]: T;
+};
 
-function get(obj: INestedObj, path: string, defaultValue?: any): any {
+function get(obj: Indexed, path: string, defaultValue?: any): any {
   const pathArr = path.split('.');
   let result = obj[pathArr[0]];
   if (result === undefined) {
@@ -18,4 +18,5 @@ function get(obj: INestedObj, path: string, defaultValue?: any): any {
   }
   return result;
 }
+
 export default get;

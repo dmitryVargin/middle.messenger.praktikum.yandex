@@ -49,6 +49,8 @@ module.exports = {
         ignoreRegExpLiterals: true,
       },
     ],
+    "no-restricted-syntax": "warn",
+    "no-continue": "off",
     'consistent-return': 'off',
     'no-console': 'warn',
     'import/no-unresolved': 'off',

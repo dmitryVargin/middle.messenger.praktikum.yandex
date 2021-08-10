@@ -3,3 +3,7 @@ module.exports = {
   singleQuote: true,
   trailingComma: 'all',
 };
+import React from 'react';
+import PropTypes from 'prop-types';
+
+
