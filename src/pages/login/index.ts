@@ -8,8 +8,8 @@ import { Props } from '../../utils/Block';
 import Validation from '../../utils/Validation';
 
 import Form from '../../modules/Form';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
+import {router} from '../../index';
+
 
 const loginInput = new DefaultInput(
   {
@@ -105,7 +105,9 @@ export const loginProps: Props = {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const { path } = target.dataset ;
+        router.go(path as string)
       },
     },
   ],

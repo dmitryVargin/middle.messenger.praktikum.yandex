@@ -1,28 +1,22 @@
-import { Login, loginProps } from './pages/login';
+import {Login, loginProps} from './pages/login';
 import loginTmpl from './pages/login/index.tmpl';
 
-import { Signup, signupProps } from './pages/signup';
+import {Signup, signupProps} from './pages/signup';
 import signupTmpl from './pages/signup/index.tmpl';
 
-import { Profile, profileProps } from './pages/profile';
+import {Profile, profileProps} from './pages/profile';
 import profileTmpl from './pages/profile/index.tmpl';
 
-import { Chat, chatProps } from './pages/chat';
+import {Chat, chatProps} from './pages/chat';
 import chatTmpl from './pages/chat/index.tmpl';
 
-import { NavTmp } from './components/navTmp';
-import navTmpTmpl from './components/navTmp/index.tmpl';
-
-import { App } from './app';
-import appTmpl from './app/index.tmpl';
 
 import ErrorPage from './pages/errorPage';
 import errorPageTmpl from './pages/errorPage/index.tmpl';
 
 import './index.scss';
-import Block, { Props } from './utils/Block';
-import render from './utils/renderDom';
-import historyPush from './utils/historyPush';
+import Block, {Props} from './utils/Block';
+import Router from './utils/Router';
 
 const routesToElem: {
   [key: string]: {
@@ -38,19 +32,19 @@ const routesToElem: {
     value: null,
     tmpl: loginTmpl,
   },
-  '/signup': {
+  '/sign-up': {
     Class: Signup,
     props: signupProps,
     value: null,
     tmpl: signupTmpl,
   },
-  '/chat': {
+  '/messenger': {
     Class: Chat,
     props: chatProps,
     value: null,
     tmpl: chatTmpl,
   },
-  '/profile': {
+  '/settings': {
     Class: Profile,
     props: profileProps,
     value: null,
@@ -85,32 +79,23 @@ export function getCurrentPage(): Block {
   return currentPage;
 }
 
-const app = new App(
+export const router = new Router('#root', new ErrorPage(
   {
-    components: {
-      navTmp: new NavTmp(
-        {
-          events: [
-            {
-              type: 'click',
-              element: '[data-path]',
-              callback(event: MouseEvent) {
-                historyPush(event, () => {
-                  app.setProps({ components: { page: getCurrentPage() } });
-                });
-              },
-            },
-          ],
-        },
-        navTmpTmpl,
-      ),
-      page: getCurrentPage(),
+    error: {
+      code: '404',
+      message: 'Страница не существует',
     },
   },
-  appTmpl,
-);
-export const appRerender = (): void => {
-  app.setProps({ components: { page: getCurrentPage() } });
-};
+  errorPageTmpl,
+));
 
-render('#root', app);
+Object.keys(routesToElem).forEach((routeInfo) => {
+  const {Class, props, tmpl} = routesToElem[routeInfo]
+  const block = new Class(props, tmpl)
+  router.use(routeInfo, block)
+})
+
+
+router.start();
+
+

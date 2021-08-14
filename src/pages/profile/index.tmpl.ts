@@ -7,7 +7,7 @@ export default `
       <div class='img-wrap'>
         <img src='{{userData.avatar}}' alt='avatar' class='profile-img'>
       </div>
-      <h3>Иван</h3>
+      <h3>{{userData.display_name}}</h3>
       <div class='row'>
         <p data-field='email' class='field-name'>Email</p>
         <p class='field-value'>{{userData.email}}</p>

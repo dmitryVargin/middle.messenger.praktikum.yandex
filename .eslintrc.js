@@ -24,7 +24,7 @@ module.exports = {
     'spaced-comment': 'off',
     'import/no-named-as-default': 'warn',
     'no-restricted-globals': 'warn',
-    quotes: [2, 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+    quotes: [2, 'single', {avoidEscape: true, allowTemplateLiterals: true}],
     'no-param-reassign': [
       2,
       {
@@ -35,6 +35,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-plusplus': 'off',
     'import/no-cycle': 'off',
+    "max-classes-per-file": "off",
     'max-len': [
       'warn',
       {
@@ -60,7 +61,7 @@ module.exports = {
       'error',
       {
         functions: false,
-        classes: true,
+        classes: false,
         variables: true,
       },
     ],
@@ -74,7 +75,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-call': 'warn',
     '@typescript-eslint/no-use-before-define': [
       'error',
-      { functions: false, classes: true, variables: true, typedefs: true },
+      {functions: false, classes: true, variables: true, typedefs: true},
     ],
   },
 };

@@ -6,5 +6,5 @@ export default `
       <div data-component='passwordInput'></div>
       <div data-component='submitButton'></div>
     </form>
-    <div class='pre-link'>Don't have an account? <a data-path='/signup' class='link'> Sign up</a></div>
+    <div class='pre-link'>Don't have an account? <a data-path='/sign-up' class='link'> Sign up</a></div>
   </div>`;

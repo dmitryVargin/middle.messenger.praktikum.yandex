@@ -4,8 +4,7 @@ import Button from '../../components/Button';
 import buttonTmpl from '../../components/Button/index.tmpl';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Validation from '../../utils/Validation';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
+import { router} from '../../index';
 import Form from '../../modules/Form';
 
 const emailInput = new DefaultInput(
@@ -231,7 +230,9 @@ export const signupProps: Props = {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const { path } = target.dataset ;
+        router.go(path as string)
       },
     },
   ],

@@ -22,16 +22,17 @@ type Attributes = {
   [key: string]: Attribute | string | ClassName | undefined;
 };
 
-type PropsEvent = {
+export type PropsEvent = {
   type: string;
   element: string;
   callback: (event: Event) => void;
 };
+
 export type Props = {
   withInternalId?: boolean;
   events?: PropsEvent[];
   attributes?: Attributes[];
-  components?: { [key: string]: any };
+  components?: { [key: string]: Block };
   [key: string]: any;
 };
 
@@ -56,7 +57,7 @@ class Block {
       tmpl,
       props,
     };
-    this.props = this._makePropsProxy({ ...props });
+    this.props = this._makePropsProxy({...props});
 
     this._registerEvents();
     this.eventBus.emit(EVENTS.INIT);
@@ -68,8 +69,14 @@ class Block {
     return this._element;
   }
 
-  destroyElem(): void {
+  destroy(): void {
+    console.log('destroy вызвался');
     this.element.remove();
+  }
+
+  create(): void {
+    console.log('create вызвался');
+    this.eventBus.emit(EVENTS.INIT)
   }
 
   getContent(): HTMLElement {
@@ -81,7 +88,7 @@ class Block {
       return;
     }
 
-    Object.assign(this.props, { ...nextProps });
+    Object.assign(this.props, {...nextProps});
   };
 
   render(): HTMLCollection {
@@ -89,7 +96,8 @@ class Block {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  componentDidMount() {}
+  componentDidMount() {
+  }
 
   protected init(): void {
     this._createResources();
@@ -100,11 +108,11 @@ class Block {
     return oldProps !== newProps;
   }
 
-  protected show(): void {
+  public show(): void {
     this.getContent().classList.remove('hidden');
   }
 
-  protected hide(): void {
+  public hide(): void {
     this.getContent().classList.add('hidden');
   }
 
@@ -116,16 +124,19 @@ class Block {
   }
 
   private _createResources(): void {
-    const element = Templator.getCompiledParent(this._meta.tmpl, this.props) as HTMLElement;
-
-    this._element = element;
+    this._element = Templator.getCompiledParent(this._meta.tmpl, this.props) as HTMLElement;
   }
 
   private _makePropsProxy<T>(target: Record<string, T>): Props {
     return new Proxy(target, {
       get: (target, prop: string): T => {
         const value = target[prop];
-        return typeof value === 'function' ? value.bind(target) : value;
+        if (typeof value === 'function') {
+          return value.bind(target) as T
+        }
+        return value
+
+        // return typeof value === 'function' ? value.bind(target) : value;
       },
       set: (target, prop: string, value: T) => {
         if (typeof target[prop] === 'object') {
@@ -133,7 +144,7 @@ class Block {
         } else {
           target[prop] = value;
         }
-        this.eventBus.emit(EVENTS.FLOW_CDU, { ...target }, target);
+        this.eventBus.emit(EVENTS.FLOW_CDU, {...target}, target);
         return true;
       },
       deleteProperty: () => {
@@ -157,7 +168,7 @@ class Block {
 
   private addEvents(): void {
     const events = this._boundEvents;
-    events.forEach(({ type, element, callback }) => {
+    events.forEach(({type, element, callback}) => {
       if (!element) {
         return;
       }
@@ -176,7 +187,7 @@ class Block {
   private removeEvents(): void {
     const events = this._boundEvents;
 
-    events.forEach(({ type, element, callback }) => {
+    events.forEach(({type, element, callback}) => {
       if (!element) {
         return;
       }
@@ -195,7 +206,7 @@ class Block {
     }
 
     this._boundEvents = [];
-    this.props.events.forEach(({ type, element, callback }) => {
+    this.props.events.forEach(({type, element, callback}) => {
       this._boundEvents.push({
         type,
         element,
@@ -204,7 +215,7 @@ class Block {
     });
   }
 
-  private setAttributes(el: Element): Element {
+  private setAttributes(el: Element): Element | undefined {
     if (this.props.attributes === undefined) {
       return;
     }
@@ -232,7 +243,7 @@ class Block {
           }
         } else {
           const attribute = obj[key] as Attribute;
-          const { type, value } = attribute;
+          const {type, value} = attribute;
           if (type === 'set') {
             innerEl.setAttribute(key, <string>value);
           } else if (type === 'remove') {

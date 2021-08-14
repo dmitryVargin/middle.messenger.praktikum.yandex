@@ -14,7 +14,7 @@ function isEqual(a: Indexed, b: Indexed): boolean {
     return a === b
   }
 
-  function compareArrays(a:Indexed, b:Indexed):boolean {
+  function compareArrays(a: Indexed, b: Indexed): boolean {
     let res = false
     if (Array.isArray(a) || Array.isArray(b)) {
       if (Array.isArray(a) && Array.isArray(b)) {
@@ -38,13 +38,14 @@ function isEqual(a: Indexed, b: Indexed): boolean {
     }
     return res;
   }
+
   if (Array.isArray(a) || Array.isArray(b)) {
-    return compareArrays(a,b) 
+    return compareArrays(a, b)
   }
 
   function compareClassicalObject(a: Indexed, b: Indexed): boolean {
     const objectsNotEmpty = Object.keys(a).length && Object.keys(b).length
-    if(!objectsNotEmpty) return true
+    if (!objectsNotEmpty) return true
     let res = false
     for (const key in a) {
       if (!a.hasOwnProperty(key)) {
@@ -53,10 +54,10 @@ function isEqual(a: Indexed, b: Indexed): boolean {
       if (isObject(a[key])) {
         res = compareClassicalObject(a[key] as Indexed, b[key] as Indexed)
       } else if (Array.isArray(a[key]) || Array.isArray(b[key])) {
-          res = compareArrays(a[key] as Indexed,b[key] as Indexed) 
-        } else {
-          res = a[key] === b[key];
-        }
+        res = compareArrays(a[key] as Indexed, b[key] as Indexed)
+      } else {
+        res = a[key] === b[key];
+      }
       if (!res) break
     }
     return res

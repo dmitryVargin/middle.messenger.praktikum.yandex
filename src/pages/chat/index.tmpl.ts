@@ -8,7 +8,7 @@ export default `
     <div class='chat-list-wrap'>
       <div class='controls-wrap'>
         <button class='img-btn'>
-          <img data-path='/profile' src='${settingIcon}' alt='' />
+          <img data-path='/settings' src='${settingIcon}' alt='' />
         </button>
         <div class='search-input-wrap'>
           <div data-component='searchInput'></div>

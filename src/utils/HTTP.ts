@@ -1,3 +1,5 @@
+import queryStringify from './queryStringify';
+
 const METHODS = {
   GET: 'GET',
   POST: 'POST',
@@ -5,29 +7,24 @@ const METHODS = {
   DELETE: 'DELETE',
 };
 
-function queryStringify(data: Record<string, unknown>) {
-  if (typeof data !== 'object') {
-    throw new TypeError('Data must be object');
-  }
-  const innerData = data as Record<string, string>;
-  const keys = Object.keys(data);
-  return keys.reduce(
-    (result, key, index) => `${result}${key}=${innerData[key]}${index < keys.length - 1 ? '&' : ''}`,
-    '?',
-  );
-}
 
-type RequestOptions = {
+export type RequestOptions = {
   method?: string;
   timeout?: number;
   data?: Record<string, unknown>;
   [key: string]: any;
 };
 
-class HTTPTransport {
+class HTTP {
+  private url: string;
+
+  constructor(url: string) {
+    this.url = url
+  }
+
   get = (url: string, options: RequestOptions = {}) =>
     this.request(
-      url,
+      this.url + url,
       {
         ...options,
         method: METHODS.GET,
@@ -37,7 +34,7 @@ class HTTPTransport {
 
   post = (url: string, options: RequestOptions = {}) =>
     this.request(
-      url,
+      this.url + url,
       {
         ...options,
         method: METHODS.POST,
@@ -47,7 +44,7 @@ class HTTPTransport {
 
   put = (url: string, options: RequestOptions = {}) =>
     this.request(
-      url,
+      this.url + url,
       {
         ...options,
         method: METHODS.PUT,
@@ -57,7 +54,7 @@ class HTTPTransport {
 
   delete = (url: string, options: RequestOptions = {}) =>
     this.request(
-      url,
+      this.url + url,
       {
         ...options,
         method: METHODS.DELETE,
@@ -66,7 +63,7 @@ class HTTPTransport {
     );
 
   request = (url: string, options: RequestOptions = {}, timeout = 5000) => {
-    const { headers = {}, method, data } = options;
+    const {headers = {}, method, data} = options;
 
     return new Promise((resolve, reject) => {
       if (!method) {
@@ -77,7 +74,7 @@ class HTTPTransport {
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
 
-      xhr.open(method, isGet && !!data ? `${url}${queryStringify(data)}` : url);
+      xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data)}` : this.url + url);
 
       Object.keys(headers).forEach((key) => {
         xhr.setRequestHeader(key, headers[key]);
@@ -108,13 +105,5 @@ class HTTPTransport {
   };
 }
 
-function fetchWithRetry(url: string, options: RequestOptions = {}): Promise<any> {
-  const { tries = 1 } = options;
-  return fetch(url, options).catch((error) => {
-    const triesLeft = tries - 1;
-    if (!triesLeft) {
-      throw error;
-    }
-    return fetchWithRetry(url, { ...options, tries: triesLeft });
-  });
-}
+
+export default HTTP

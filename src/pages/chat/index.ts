@@ -1,14 +1,15 @@
-import Block, { Props } from '../../utils/Block';
+import Block, {Props, PropsEvent} from '../../utils/Block';
 import ArrowButton from '../../components/ArrowButton';
 import arrowButtonTmpl from '../../components/ArrowButton/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import searchInputTmpl from '../../components/searchInput/index.tmpl';
 
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
 
-class ChatList extends Block {}
+import {router} from '../../index';
+
+class ChatList extends Block {
+}
 
 type MessageObj = {
   messageId: number;
@@ -16,7 +17,7 @@ type MessageObj = {
   time: Date;
   isOwn: boolean;
 };
-const messageTmpl = ({ messageId, message, time, isOwn }: MessageObj): string => {
+const messageTmpl = ({messageId, message, time, isOwn}: MessageObj): string => {
   const messageOwner = isOwn ? 'own' : 'other';
   return `
   <div data-id='${messageId}' class='message ${messageOwner}'>
@@ -58,7 +59,14 @@ type ChatObj = {
   isLastMsgOwn: boolean;
   lastMsg: string;
 };
-const chatTemplate = ({ logo, name, lastMsgDate, unreadMsgCount, isLastMsgOwn, lastMsg }: ChatObj): string => {
+const chatTemplate = ({
+                        logo,
+                        name,
+                        lastMsgDate,
+                        unreadMsgCount,
+                        isLastMsgOwn,
+                        lastMsg
+                      }: ChatObj): string => {
   const isLastMsgOwnCaption = isLastMsgOwn ? "<span class='own-msg'>Вы:</span>" : '';
   return `
   <div class='chat'>
@@ -126,7 +134,8 @@ const someDataFromServer = {
   chatMock,
 };
 
-class Messages extends Block {}
+class Messages extends Block {
+}
 
 function getMessages(newMessage?: string) {
   const messagesArr = someDataFromServer.messagesMock;
@@ -167,7 +176,7 @@ export class Chat extends Block {
           chatList,
         },
         events: [
-          ...this.props.events,
+          ...this.props.events as PropsEvent[],
           {
             type: 'click',
             element: '.chat',
@@ -197,7 +206,9 @@ export const chatProps: Props = {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const {path} = target.dataset;
+        router.go(path as string)
       },
     },
     {

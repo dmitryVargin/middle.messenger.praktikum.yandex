@@ -1,8 +1,7 @@
 import ArrowButton from '../../components/ArrowButton/index';
 import arrowButtonTmpl from '../../components/ArrowButton/index.tmpl';
 import Block from '../../utils/Block';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
+import { router} from '../../index';
 import EditFieldPopup from '../../components/popups/EditFieldPopup';
 import editFieldPopupTmpl from '../../components/popups/EditFieldPopup/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
@@ -25,7 +24,7 @@ const arrowBtn = new ArrowButton(
         element: 'root',
         'data-path': {
           type: 'set',
-          value: '/chat',
+          value: '/messenger',
         },
       },
     ],
@@ -34,7 +33,9 @@ const arrowBtn = new ArrowButton(
         type: 'click',
         element: 'root',
         callback(event: Event) {
-          historyPush(event, appRerender);
+          const target = event.target as HTMLElement;
+          const { path } = target.dataset ;
+          router.go(path as string)
         },
       },
     ],
@@ -116,7 +117,7 @@ function openPopup(fieldName: string) {
             }
             console.log(formDataObj);
             // @ts-ignore
-            this.destroyElem();
+            this.destroy();
           },
         },
         {
@@ -124,7 +125,7 @@ function openPopup(fieldName: string) {
           element: '.close-popup',
           callback() {
             // @ts-ignore
-            this.destroyElem();
+            this.destroy();
           },
         },
       ],
@@ -152,7 +153,9 @@ export const profileProps = {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const { path } = target.dataset ;
+        router.go(path as string)
       },
     },
   ],
