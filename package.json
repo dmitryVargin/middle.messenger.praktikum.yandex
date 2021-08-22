@@ -8,10 +8,7 @@
     "build": "parcel build index.html --no-scope-hoist",
     "eslint": "eslint src",
     "stylelint": "stylelint src/*.scss",
-    "test": "mocha",
-    "check-types": "tsc",
-    "compile": "babel src -d lib --extensions '.ts,.tsx'",
-    "prepublish": "npm run check-types && npm run compile"
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
