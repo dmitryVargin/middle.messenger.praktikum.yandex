@@ -50,7 +50,7 @@ module.exports = {
         ignoreRegExpLiterals: true,
       },
     ],
-    "no-restricted-syntax": "warn",
+    "no-restricted-syntax": "off",
     "no-continue": "off",
     'consistent-return': 'off',
     'no-console': 'warn',
@@ -73,6 +73,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
+    '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-use-before-define': [
       'error',
       {functions: false, classes: true, variables: true, typedefs: true},

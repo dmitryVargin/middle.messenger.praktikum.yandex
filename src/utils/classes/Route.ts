@@ -1,6 +1,6 @@
 import {Pathname} from './Router';
-import Block from './Block';
-import renderDom from './renderDom';
+import Block from '../../modules/Block/Block';
+import renderDom from '../functions/renderDom';
 
 type Props = { rootQuery: string }
 
@@ -14,10 +14,13 @@ class Route {
 
   private init = false
 
-  constructor(pathname: Pathname, view: Block, props: Props) {
+  public isProtected: boolean
+
+  constructor(pathname: Pathname, view: Block, props: Props, isProtected: boolean) {
     this.pathname = pathname;
     this._block = view;
     this._props = props;
+    this.isProtected = isProtected
   }
 
   navigate(pathname: Pathname): void {
@@ -26,6 +29,8 @@ class Route {
       this.render();
     }
   }
+
+
 
   leave(): void {
     this._block.destroy();

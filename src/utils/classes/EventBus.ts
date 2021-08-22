@@ -27,8 +27,6 @@ class EventBus {
       this.listeners[event].forEach((listener) => {
         listener(...callbackArgs);
       });
-    } else {
-      throw new Error(`Нет события: ${event}`);
     }
   }
 }

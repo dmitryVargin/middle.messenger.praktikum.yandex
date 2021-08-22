@@ -1,4 +1,4 @@
-import {RequestOptions} from './HTTP';
+import {RequestOptions} from '../classes/HTTP';
 
 function fetchWithRetry(url: string, options: RequestOptions = {}): Promise<any> {
   const {tries = 1} = options;

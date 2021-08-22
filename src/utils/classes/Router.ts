@@ -1,5 +1,6 @@
-import Block from './Block';
+import Block from '../../modules/Block/Block';
 import Route from './Route';
+import AuthController from '../../controllers/AuthController';
 
 export type Pathname = string
 
@@ -14,11 +15,7 @@ class Router {
 
   private readonly _rootQuery: string = ''
 
-  private errorPage: Block;
-
-
-  constructor(rootQuery: string, errorPage: Block) {
-    this.errorPage = errorPage
+  constructor(rootQuery: string,) {
     if (Router.__instance) {
       return Router.__instance;
     }
@@ -27,10 +24,14 @@ class Router {
     Router.__instance = this;
   }
 
-  use(pathname: Pathname, block: Block): Router {
-    const route = new Route(pathname, block, {rootQuery: this._rootQuery});
+  use(pathname: Pathname, block: Block, isProtected: boolean): Router {
+    const route = new Route(pathname, block, {rootQuery: this._rootQuery}, isProtected);
     this.routes.push(route);
     return this
+  }
+
+  getCurrentRoute(): Route | null {
+    return this._currentRoute
   }
 
   start(): void {
@@ -45,20 +46,23 @@ class Router {
   }
 
   _onRoute(pathname: Pathname): void {
-    const route = this.getRoute(pathname);
-    if (route === undefined) {
-      if (this._currentRoute) {
-        this._currentRoute.leave();
-      }
-      new Route(pathname, this.errorPage, {rootQuery: this._rootQuery}).render()
-    } else {
-      if (this._currentRoute) {
-        this._currentRoute.leave();
-      }
-      this._currentRoute = route;
-      route.render();
+    const route = this.getRoute(pathname) ?? this.getRoute('errorPage') as Route;
+    if (this._currentRoute) {
+      this._currentRoute.leave();
     }
-
+    if (route.isProtected) {
+      AuthController.checkUserLoggedIn()
+        .then(() => {
+          this._currentRoute = route;
+          route.render();
+        })
+        .catch(() => {
+          this.go('/login')
+        })
+      return
+    }
+    this._currentRoute = route;
+    route.render();
   }
 
 
@@ -78,6 +82,7 @@ class Router {
   getRoute(pathname: Pathname): Route | undefined {
     return this.routes.find(route => route.pathname === pathname);
   }
+
 }
 
 export default Router;

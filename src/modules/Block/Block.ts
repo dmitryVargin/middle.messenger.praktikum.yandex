@@ -1,5 +1,7 @@
-import EventBus from './EventBus';
-import Templator from './Templator';
+import EventBus from '../../utils/classes/EventBus';
+import Templator from '../../utils/classes/Templator';
+import store, {Store} from '../../store/Store';
+
 
 enum EVENTS {
   INIT = 'init',
@@ -32,7 +34,7 @@ export type Props = {
   withInternalId?: boolean;
   events?: PropsEvent[];
   attributes?: Attributes[];
-  components?: { [key: string]: Block };
+  components?: { [key: string]: Block | Block[] };
   [key: string]: any;
 };
 
@@ -50,6 +52,7 @@ class Block {
 
   private _boundEvents: PropsEvent[];
 
+
   constructor(props = {}, tmpl: string) {
     this._boundEvents = [];
     this.eventBus = new EventBus();
@@ -57,7 +60,7 @@ class Block {
       tmpl,
       props,
     };
-    this.props = this._makePropsProxy({...props});
+    this.props = this._makeProxy({...props});
 
     this._registerEvents();
     this.eventBus.emit(EVENTS.INIT);
@@ -70,12 +73,10 @@ class Block {
   }
 
   destroy(): void {
-    console.log('destroy вызвался');
     this.element.remove();
   }
 
   create(): void {
-    console.log('create вызвался');
     this.eventBus.emit(EVENTS.INIT)
   }
 
@@ -87,7 +88,6 @@ class Block {
     if (!nextProps) {
       return;
     }
-
     Object.assign(this.props, {...nextProps});
   };
 
@@ -127,7 +127,7 @@ class Block {
     this._element = Templator.getCompiledParent(this._meta.tmpl, this.props) as HTMLElement;
   }
 
-  private _makePropsProxy<T>(target: Record<string, T>): Props {
+  private _makeProxy<T>(target: Record<string, T>): Record<string, T> {
     return new Proxy(target, {
       get: (target, prop: string): T => {
         const value = target[prop];
@@ -135,12 +135,14 @@ class Block {
           return value.bind(target) as T
         }
         return value
-
-        // return typeof value === 'function' ? value.bind(target) : value;
       },
       set: (target, prop: string, value: T) => {
         if (typeof target[prop] === 'object') {
-          Object.assign(target[prop], value);
+          if (prop === 'events') {
+            Object.assign(target[prop], value);
+          } else {
+            target[prop] = value;
+          }
         } else {
           target[prop] = value;
         }
@@ -169,6 +171,7 @@ class Block {
   private addEvents(): void {
     const events = this._boundEvents;
     events.forEach(({type, element, callback}) => {
+
       if (!element) {
         return;
       }
@@ -195,10 +198,13 @@ class Block {
       let innerEl;
       if (element === 'root') {
         innerEl = this.element;
+        innerEl.removeEventListener(type, callback);
       } else {
-        innerEl = this.element.querySelector(element) as HTMLElement;
+        innerEl = this.element.querySelectorAll(element);
+        innerEl.forEach((el) => {
+          el.removeEventListener(type, callback);
+        });
       }
-      innerEl.removeEventListener(type, callback);
     });
 
     if (!this.props.events) {
@@ -259,6 +265,7 @@ class Block {
   private _render(): void {
     const block = this.render();
 
+
     if (block.length) {
       this._element.innerHTML = '';
       this._element.append(...block);
@@ -266,6 +273,7 @@ class Block {
     this.removeEvents();
     this.setAttributes(this._element);
     this.addEvents();
+
   }
 }
 

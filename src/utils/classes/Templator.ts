@@ -1,39 +1,32 @@
-import get from './get';
-import isEmpty from './isEmpty';
-import Block, { Props } from './Block';
+import get from '../functions/get';
+import {Props} from '../../modules/Block/Block';
 
 const Templator = {
   compile(tmpl: string, ctx = {}): string {
-    let key = null;
     const regExp = /{{(.*?)}}/gi;
     let innerTmpl = tmpl;
-    // eslint-disable-next-line no-cond-assign
-    while ((key = regExp.exec(innerTmpl))) {
-      if (key[1]) {
-        const tmplValue = key[1].trim();
-        const data = get(ctx, tmplValue) as string;
-        const dataForTmpl = isEmpty(data) ? '' : data;
-        innerTmpl = innerTmpl.replace(new RegExp(key[0], 'gi'), dataForTmpl);
-      }
-    }
-    return innerTmpl;
-  },
-
-  compilePassEmpty(tmpl: string, ctx = {}): string {
-    let key = null;
-    const regExp = /{{(.*?)}}/gi;
-    let innerTmpl = tmpl;
-    // eslint-disable-next-line no-cond-assign
-    while ((key = regExp.exec(innerTmpl))) {
-      if (key[1]) {
-        const tmplValue = key[1].trim();
-        const data = get(ctx, tmplValue) as string;
-        const dataForTmpl = isEmpty(data) ? '' : data;
-        if (data) {
-          innerTmpl = innerTmpl.replace(new RegExp(key[0], 'gi'), dataForTmpl);
+    const matches = Array.from(tmpl.matchAll(regExp))
+    matches.forEach(arr => {
+      const tmplValue = arr[1].trim();
+      const data = get(ctx, tmplValue) as string;
+      const idDate = tmplValue.includes('.time')
+      let dataForTmpl
+      if (idDate) {
+        const date = new Date(data)
+        const today = new Date()
+        if (date.toDateString() === today.toDateString()) {
+          dataForTmpl = new Date(data).toLocaleTimeString().slice(0, -3)
+        } else {
+          dataForTmpl = new Date(data).toLocaleDateString()
         }
+
+      } else {
+        dataForTmpl = data === undefined || data === null ? '' : data;
       }
-    }
+
+      innerTmpl = innerTmpl.replace(new RegExp(arr[0], 'gi'), dataForTmpl);
+    })
+
     return innerTmpl;
   },
 
@@ -53,6 +46,7 @@ const Templator = {
 
   compileToHtml(tmpl: string, ctx: Props): Element {
     let innerTmpl = tmpl;
+
     innerTmpl = this.compile(innerTmpl, ctx);
 
     const domParser = new DOMParser();
@@ -60,16 +54,15 @@ const Templator = {
       .body.children[0];
     if (ctx.components) {
       htmlTmpl.querySelectorAll('[data-component]').forEach((node) => {
-        // console.log(ctx);
         if (ctx.components !== undefined && node instanceof HTMLElement) {
           const componentContent = ctx.components[
             node.dataset.component as string
-          ] as Block | Block[];
+            ];
           if (componentContent !== undefined) {
             if (Array.isArray(componentContent)) {
-              node.replaceWith(
-                ...componentContent.map((component) => component.getContent()),
-              );
+              const div = document.createDocumentFragment()
+              div.append(...componentContent.map((component) => component.getContent()))
+              node.replaceWith(div);
             } else {
               node.replaceWith(componentContent.getContent());
             }
@@ -79,19 +72,6 @@ const Templator = {
     }
 
     return htmlTmpl;
-  },
-
-  compileConcat(
-    data: {
-      template: string;
-      context: Props;
-    }[],
-  ): string {
-    let res = '';
-    data.forEach((obj) => {
-      res += Templator.compile(obj.template, obj.context);
-    });
-    return res;
   },
 };
 

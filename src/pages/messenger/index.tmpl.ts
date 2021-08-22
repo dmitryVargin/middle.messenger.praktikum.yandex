@@ -2,6 +2,9 @@ import settingIcon from 'url:../../../static/img/settings.svg';
 import plusIcon from 'url:../../../static/img/plus.svg';
 import dotBtn from 'url:../../../static/img/dot-btn.svg';
 import attachIcon from 'url:../../../static/img/attach.svg';
+import userIcon from 'url:../../../static/img/user-icon.svg';
+import camera from 'url:../../../static/img/camera.svg';
+import trash from 'url:../../../static/img/trash.svg';
 
 export default `
   <div class='chat-wrap'>
@@ -28,6 +31,20 @@ export default `
           <div class='chat-name'>{{chatName}}</div>
         </div>
         <button class='settings-btn img-btn'>
+          <div class="settings-popup hidden">
+             <div data-action="chatUserList" class="item">
+               <div class="img-btn"><img src=${userIcon} alt=""></div>
+               <div>Список пользователей</div>
+            </div>
+             <div data-action="chatAvatarUpdate" class="item">
+               <div class="img-btn"><img src=${camera} alt=""></div>
+               <div>Изменить аватар чата</div>
+            </div>
+             <div data-action="deleteChat" class="item">
+               <div class="img-btn"><img src=${trash} alt=""></div>
+               <div>Удалить чат</div>
+            </div>
+          </div>
           <img src='${dotBtn}' alt='' />
         </button>
       </div>

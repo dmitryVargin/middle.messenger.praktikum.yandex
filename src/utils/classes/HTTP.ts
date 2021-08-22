@@ -1,4 +1,4 @@
-import queryStringify from './queryStringify';
+import queryStringify from '../functions/queryStringify';
 
 const METHODS = {
   GET: 'GET',
@@ -7,12 +7,14 @@ const METHODS = {
   DELETE: 'DELETE',
 };
 
+type Data = FormData | Record<string, unknown> | string
 
 export type RequestOptions = {
-  method?: string;
-  timeout?: number;
-  data?: Record<string, unknown>;
-  [key: string]: any;
+  method?: string
+  timeout?: number
+  withCredentials?: boolean
+  data?: Data
+  [key: string]: any
 };
 
 class HTTP {
@@ -24,7 +26,7 @@ class HTTP {
 
   get = (url: string, options: RequestOptions = {}) =>
     this.request(
-      this.url + url,
+      url,
       {
         ...options,
         method: METHODS.GET,
@@ -34,7 +36,7 @@ class HTTP {
 
   post = (url: string, options: RequestOptions = {}) =>
     this.request(
-      this.url + url,
+      url,
       {
         ...options,
         method: METHODS.POST,
@@ -44,7 +46,7 @@ class HTTP {
 
   put = (url: string, options: RequestOptions = {}) =>
     this.request(
-      this.url + url,
+      url,
       {
         ...options,
         method: METHODS.PUT,
@@ -54,7 +56,7 @@ class HTTP {
 
   delete = (url: string, options: RequestOptions = {}) =>
     this.request(
-      this.url + url,
+      url,
       {
         ...options,
         method: METHODS.DELETE,
@@ -62,8 +64,8 @@ class HTTP {
       options.timeout,
     );
 
-  request = (url: string, options: RequestOptions = {}, timeout = 5000) => {
-    const {headers = {}, method, data} = options;
+  request = (url: string, options: RequestOptions = {}, timeout = 5000): Promise<XMLHttpRequest> => {
+    const {headers = {}, method, data, withCredentials} = options;
 
     return new Promise((resolve, reject) => {
       if (!method) {
@@ -73,6 +75,8 @@ class HTTP {
 
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
+
+      xhr.withCredentials = !!withCredentials
 
       xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data)}` : this.url + url);
 
@@ -99,7 +103,7 @@ class HTTP {
       if (isGet || !data) {
         xhr.send();
       } else {
-        xhr.send(data);
+        xhr.send(data as BodyInit);
       }
     });
   };

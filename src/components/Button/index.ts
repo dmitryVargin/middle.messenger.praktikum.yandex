@@ -1,4 +1,4 @@
-import Block from '../../utils/Block';
+import Block from '../../modules/Block/Block';
 
 class Button extends Block {
   get button(): HTMLButtonElement {
