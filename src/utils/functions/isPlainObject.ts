@@ -1,4 +1,4 @@
-function isPlainObject(value: unknown): value is boolean {
+function isPlainObject(value: unknown): boolean {
   return typeof value === 'object'
     && value !== null
     && value.constructor === Object

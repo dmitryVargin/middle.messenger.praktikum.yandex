@@ -1,12 +1,10 @@
 function range(start = 0, end: number, step = 1, isRight: boolean): number[] | undefined {
   const res: number[] = [];
 
+  // eslint-disable-next-line prefer-rest-params
   const notEmptyArgs = [...arguments].filter((value) => value !== undefined);
   const rangeArgsQuantity = isRight ? notEmptyArgs.length - 1 : notEmptyArgs.length;
   if (rangeArgsQuantity === 1) {
-    if (typeof start !== 'number') {
-      return;
-    }
     if (start === 0) {
       return res;
     }
@@ -20,10 +18,6 @@ function range(start = 0, end: number, step = 1, isRight: boolean): number[] | u
       }
     }
   } else {
-    if (typeof start !== 'number' || typeof end !== 'number' || typeof step !== 'number') {
-      return;
-    }
-
     const innerStep = step || 1;
     if (step === 0) {
       for (let i = start; i <= Math.abs(end - start); i++) {
@@ -45,6 +39,4 @@ function range(start = 0, end: number, step = 1, isRight: boolean): number[] | u
   return res;
 }
 
-function rangeRight(start: number, end: number, step: number) {
-  return range(start, end, step, true);
-}
+export default range

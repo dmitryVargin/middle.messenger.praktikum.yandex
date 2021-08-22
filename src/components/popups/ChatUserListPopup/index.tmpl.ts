@@ -6,8 +6,8 @@ export default `
         <div class='title'>{{title}}</div>
         <div data-component="plusBtn"></div>
       </div>
-    <form>
-     <div data-component='searchInput'></div>
-     <div data-component='userList'></div>
-    </form>
+      <form>
+        <div data-component='userList'></div>
+      </form>
+    </div>
   </div>`

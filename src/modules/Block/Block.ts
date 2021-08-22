@@ -1,6 +1,5 @@
 import EventBus from '../../utils/classes/EventBus';
 import Templator from '../../utils/classes/Templator';
-import store, {Store} from '../../store/Store';
 
 
 enum EVENTS {
@@ -273,8 +272,14 @@ class Block {
     this.removeEvents();
     this.setAttributes(this._element);
     this.addEvents();
-
+    this.afterRender()
   }
+
+  forceUpdate():void {
+    this.eventBus.emit(EVENTS.INIT);
+  }
+
+  afterRender():void {}
 }
 
 export default Block;

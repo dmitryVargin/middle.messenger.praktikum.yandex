@@ -1,4 +1,4 @@
-import queryStringify from '../functions/queryStringify';
+import queryStringify, {PlainObject} from '../functions/queryStringify';
 
 const METHODS = {
   GET: 'GET',
@@ -78,7 +78,7 @@ class HTTP {
 
       xhr.withCredentials = !!withCredentials
 
-      xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data)}` : this.url + url);
+      xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data as PlainObject)}` : this.url + url);
 
       Object.keys(headers).forEach((key) => {
         xhr.setRequestHeader(key, headers[key]);

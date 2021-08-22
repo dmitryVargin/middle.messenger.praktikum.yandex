@@ -4,15 +4,12 @@ import arrowButtonTmpl from '../../components/ArrowButton/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import searchInputTmpl from '../../components/searchInput/index.tmpl';
-
-
 import {router} from '../../index';
 import ChatController from '../../controllers/ChatsController';
-import EditFieldPopup from '../../components/popups/EditFieldPopup';
+import FormPopup from '../../components/popups/FormPopup';
+import formPopupTmpl from '../../components/popups/FormPopup/index.tmpl';
 import getObjFromFormData from '../../utils/functions/getObjFromFormData';
 import store, {Chat, Chats} from '../../store/Store';
-import editFieldPopupTmpl
-  from '../../components/popups/EditFieldPopup/index.tmpl';
 import Button from '../../components/Button';
 import buttonTmpl from '../../components/Button/index.tmpl';
 import ChatItem from '../../components/ChatItem';
@@ -20,110 +17,22 @@ import chatItemTmpl from '../../components/ChatItem/index.tmpl'
 import Templator from '../../utils/classes/Templator';
 import ChatsApi from '../../api/ChatsApi';
 import MessageApi from '../../api/MessageApi';
-import ConfirmPopup from '../../components/popups/ConfirmPopup';
-import confirmPopupTmpl from '../../components/popups/ConfirmPopup/index.tmpl';
-import {checkValidationByTemplate} from '../../utils/classes/Validation';
-import UserListPopup from '../../components/popups/UserListPopup';
-import userListPopupTmpl
-  from '../../components/popups/UserListPopup/index.tmpl';
-import UserAddPopup from '../../components/popups/UserAddPopup';
-import userAddPopupTmpl
-  from '../../components/popups/UserAddPopup/index.tmpl';
+import messages from '../../components/Messages';
+import userListPopup from '../../components/popups/ChatUserListPopup';
+import encodeHTML from '../../utils/functions/encodeHTML';
+import deepEncodeHTML from '../../utils/functions/deepEncodeHTML';
 
-import {resourcesUrl} from '../../utils/variables';
-import PlusCircleButton from '../../components/PlusCircleButton';
-import plusCircleButtonTmpl from '../../components/PlusCircleButton/index.tmpl';
-import CloseCircleButton from '../../components/CloseCircleButton';
-import closeCircleButtonTmpl
-  from '../../components/CloseCircleButton/index.tmpl';
-import UserContoller from '../../controllers/UserContoller';
-//
-export type MessageObj = {
-  id: string;
-  time: Date;
-  user_id: string
-  content: string
-  type: 'message'
-};
-
-const messageTemplator = ({
-                            id,
-                            time,
-                            user_id,
-                            content,
-                            type
-                          }: MessageObj): string => {
-  const messageOwner = +user_id === store.userData.id ? 'own' : 'other';
-  const innerTime = new Date(time).toLocaleTimeString().slice(0, -3)
-  return `
-  <div data-id='${id}' class='message ${messageOwner}'>
-    <p class='text'>
-      ${content}
-    </p>
-    <div class='info'>
-      <div class='time'>${innerTime}</div>
-    </div>
-  </div>`;
-};
-
-
-const searchInput = new DefaultInput({}, searchInputTmpl);
-
-const messageInput = new DefaultInput(
-  {
-    attributes: [
-      {
-        element: 'root',
-        className: {
-          type: 'add',
-          value: 'fullwidth',
-        },
-      },
-    ],
-  },
-  defaultInputTmpl,
-);
 
 const arrowBtn = new ArrowButton({}, arrowButtonTmpl);
 
-class Messages extends Block {
-  render(): HTMLCollection {
-    const messagesArray = this.props.activeChatMessages as MessageObj[]
-    const messages = new Block({}, `<div>${messagesArray.map(message => messageTemplator(message)).join()}</div>`)
-    const result = Templator.getCompiledChildren(this._meta.tmpl, {
-      ...this.props,
-      components: {
-        ...this.props.components,
-        messages,
-      }
-    });
-    return Templator.getCompiledChildren(this._meta.tmpl, {
-      ...this.props,
-      components: {
-        ...this.props.components,
-        messages,
-      }
-    });
-    document.querySelector('.empty-chat')?.classList.add('hidden');
-    document.querySelector('.chat-content-wrap')?.classList.remove('hidden');
-  }
-}
-
-const messageTmpl = `<div><div data-component="messages"></div></div>`
-export const messages = new Messages({activeChatMessages: store.activeChatMessages}, messageTmpl);
-
 
 export class Messenger extends Block {
-  updateMessages(messages: MessageObj[]) {
-    document.querySelector('.empty-chat')?.classList.add('hidden');
-    document.querySelector('.chat-content-wrap')?.classList.remove('hidden');
-  }
-
   sendMessage(message: string): void {
     this.props.socket.send(JSON.stringify({
-      content: message,
+      content: encodeHTML(message),
       type: 'message'
     }))
+
   }
 
 
@@ -132,16 +41,23 @@ export class Messenger extends Block {
   }
 
   render(): HTMLCollection {
-    // TODO лишние рендеры
     const chats = this.props.chats as Chats
-    const chatList = chats.map(chat => new ChatItem(chat, chatItemTmpl))
+    const chatList = chats.map(chat => new ChatItem({}, chatItemTmpl(chat)))
     return Templator.getCompiledChildren(this._meta.tmpl, {
       ...this.props,
+      activeChatAvatar: store.activeChat.avatar ? '' : 'empty',
       components: {
         ...this.props.components,
         chatList,
       }
     });
+  }
+
+  afterRender() {
+    if (!store.activeChat?.id) {
+      this.element.querySelector('.empty-chat').classList.remove('hidden')
+      this.element.querySelector('.chat-content-wrap').classList.add('hidden')
+    }
   }
 }
 
@@ -171,12 +87,11 @@ function openChangeChatAvatarPopup(activeChatId: number) {
     },
     defaultInputTmpl,
   );
-  const editPopup = new EditFieldPopup(
+  const editPopup = new FormPopup(
     {
       title: 'Update chat avatar',
       components: {
-        input: [chatIdInput, fileInput],
-        submitBtn,
+        formElements: [chatIdInput, fileInput, submitBtn]
       },
       events: [
         {
@@ -199,7 +114,7 @@ function openChangeChatAvatarPopup(activeChatId: number) {
         },
       ],
     },
-    editFieldPopupTmpl,
+    formPopupTmpl,
   );
   document.body.append(editPopup.getContent());
 }
@@ -213,11 +128,11 @@ function deleteChatPopupOpen(chat: Chat) {
     },
     buttonTmpl,
   );
-  const deletePopup = new ConfirmPopup(
+  const deletePopup = new FormPopup(
     {
       title: `Confirm deleting chat ${chat.title}`,
       components: {
-        submitBtn,
+        formElements: [submitBtn]
       },
       events: [
         {
@@ -240,7 +155,7 @@ function deleteChatPopupOpen(chat: Chat) {
         },
       ],
     },
-    confirmPopupTmpl,
+    formPopupTmpl,
   );
   document.body.append(deletePopup.getContent());
 }
@@ -279,12 +194,11 @@ function openAddChatPopup() {
     },
     defaultInputTmpl,
   );
-  const editPopup = new EditFieldPopup(
+  const editPopup = new FormPopup(
     {
       title: 'Create chat',
       components: {
-        input,
-        submitBtn,
+        formElements: [input, submitBtn]
       },
       events: [
         {
@@ -307,168 +221,19 @@ function openAddChatPopup() {
         },
       ],
     },
-    editFieldPopupTmpl,
+    formPopupTmpl,
   );
   document.body.append(editPopup.getContent());
 }
 
-function openAddUserToChatPopup() {
-  const searchInput = new DefaultInput({
-    type: 'text',
-    name: 'search',
-    label: 'Поиск пользователей',
-    events: [
-      {
-        type: 'input',
-        element: 'input',
-        callback(event: Event) {
-          const target = event.target as HTMLInputElement
-          UserContoller.searchUsersByLogin(target.value)
-            .then(xhr => {
-              store.searchUserList = xhr.response
-              console.log(xhr.response);
-            })
-        },
-      },
-    ]
-  }, searchInputTmpl);
-  const userItemTmpl = `<div class="user-item">
-                          <div class="user-info">
-                            <div class="user-avatar"><img src="${resourcesUrl}{{avatar}}" alt=""></div>
-                            <div>{{first_name}} {{second_name}}</div>
-                          </div>
-                          <input name="user" value="{{id}}" type="checkbox">
-                          <button>добавить выбранных</button>
-                        </div>`
-
-  function getUserList() {
-    return store.searchUserList.map((user) => new Block(user, userItemTmpl))
-  }
-
-  const userList = getUserList()
-
-  const addUserPopup = new UserAddPopup(
-    {
-      title: `Добавить пользователей`,
-      components: {
-        searchInput,
-        userList,
-      },
-      events: [
-        {
-          type: 'submit',
-          element: 'form',
-          callback(event: Event) {
-            event.preventDefault();
-            const target = event.target as HTMLFormElement;
-            const formData = new FormData(target)
-            console.log(getObjFromFormData(formData));
-            //TODO
-            // ChatController.addUsersToChatById(store.activeChat.id, [117188])
-            // @ts-ignore
-            this.destroy();
-          },
-        },
-        {
-          type: 'click',
-          element: '.close-popup',
-          callback() {
-            // @ts-ignore
-            this.destroy();
-
-          },
-        },
-        {
-          type: 'click',
-          element: '.add-user-btn',
-          callback() {
-            // @ts-ignore
-            this.destroy();
-          },
-        },
-      ],
-    },
-    userAddPopupTmpl,
-  );
-  document.body.append(addUserPopup.getContent());
-}
-
 function openChatUserListPopup() {
-  const searchInput = new DefaultInput({}, searchInputTmpl);
-  const userItemTmpl = `<div class="user-item">
-                          <div class="user-info">
-                            <div class="user-avatar"><img src="${resourcesUrl}{{avatar}}" alt=""></div>
-                            <div>{{first_name}} {{second_name}}</div>
-                          </div>
-                          <div data-component="closeCircleButton"></div>
-                        </div>`
-
-  const closeCircleButton = new CloseCircleButton({}, closeCircleButtonTmpl)
-
-  const userList = store.activeChatUsers.map((user) => new Block({
-    ...user,
-    components: {closeCircleButton},
-  }, userItemTmpl))
-
-  const plusBtn = new PlusCircleButton({}, plusCircleButtonTmpl)
-
-  const userListPopup = new UserListPopup(
-    {
-      title: `Список пользователей`,
-      components: {
-        searchInput,
-        userList,
-        plusBtn,
-      },
-      attributes: [
-        {
-          element: 'root',
-          className: {
-            type: 'add',
-            value: 'user-list-popup',
-          },
-        },
-      ],
-      events: [
-        {
-          type: 'submit',
-          element: 'form',
-          callback(event: Event) {
-            event.preventDefault();
-            const target = event.target as HTMLFormElement;
-            const formData = new FormData(target)
-            console.log(getObjFromFormData(formData));
-            // @ts-ignore
-            this.destroy();
-          },
-        },
-        {
-          type: 'click',
-          element: '.close-popup',
-          callback() {
-            // @ts-ignore
-            this.destroy();
-          },
-        },
-        {
-          type: 'click',
-          element: '.circle-button',
-          callback() {
-            // @ts-ignore
-            openAddUserToChatPopup()
-            this.destroy();
-          }
-        },
-      ],
-    },
-    userListPopupTmpl,
-  );
   document.body.append(userListPopup.getContent());
-
 }
+
 
 export const messengerProps: Props = {
   chats: [],
+  chatAvatarClass: 'empty',
   events: [
     {
       type: 'click',
@@ -484,8 +249,6 @@ export const messengerProps: Props = {
       element: '.settings-btn',
       callback(): void {
         document.querySelector('.settings-popup')!.classList.toggle('hidden')
-        // const {path} = target.dataset;
-        // router.go(path as string)
       },
     },
     {
@@ -503,6 +266,7 @@ export const messengerProps: Props = {
         this.sendMessage(this.element.querySelector('.controls input').value);
         // @ts-ignore
         this.element.querySelector('.controls input').value = '';
+        ChatController.getChats()
       },
     },
     {
@@ -519,8 +283,6 @@ export const messengerProps: Props = {
         } else if (action === 'chatUserList') {
           openChatUserListPopup()
         }
-
-        console.log(action);
       },
     },
     {
@@ -531,6 +293,10 @@ export const messengerProps: Props = {
         const {id} = target.dataset;
         if (id === undefined) return
         if (+id !== store.activeChat.id) {
+          if (this.props.socket) {
+            this.props.socket.close()
+            store.activeChatMessages = []
+          }
           store.activeChat = store.chats.find(chat => chat.id === +id) as Chat
           ChatController.getChatUsersById(+id)
           ChatsApi.getToken(+id).then(xhr => {
@@ -538,7 +304,6 @@ export const messengerProps: Props = {
             const socket = MessageApi.startChat(store.userData.id as number, +id, token)
             let i
             socket.addEventListener('open', () => {
-              console.log('Соединение установлено');
               i = setInterval(() => {
                 socket.send(JSON.stringify({
                   type: 'ping'
@@ -556,7 +321,7 @@ export const messengerProps: Props = {
               ;
             });
             socket.onmessage = (event) => {
-              const messages = JSON.parse(event.data) as MessageObj[] | MessageObj
+              const messages = deepEncodeHTML(JSON.parse(event.data))
               if (messages.type === 'pong') return
               let activeChatMessages
               if (Array.isArray(messages)) {
@@ -579,6 +344,7 @@ export const messengerProps: Props = {
             this.setProps({socket})
           })
           this.setProps({
+            activeChatAvatar: store.activeChat.avatar ? '' : 'empty',
             attributes: [
               {
                 element: '.empty-chat',
@@ -602,8 +368,21 @@ export const messengerProps: Props = {
   ],
   components: {
     messages,
-    searchInput,
-    messageInput,
+    searchInput: new DefaultInput({}, searchInputTmpl),
+    messageInput: new DefaultInput(
+      {
+        attributes: [
+          {
+            element: 'root',
+            className: {
+              type: 'add',
+              value: 'fullwidth',
+            },
+          },
+        ],
+      },
+      defaultInputTmpl,
+    ),
     arrowBtn,
   },
 };

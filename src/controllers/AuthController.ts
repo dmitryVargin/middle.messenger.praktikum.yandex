@@ -1,6 +1,7 @@
 import AuthApi from '../api/AuthApi';
 import {router} from '../index';
 import store, {storeUserInitial} from '../store/Store';
+import deepEncodeHTML from '../utils/functions/deepEncodeHTML';
 
 
 export type SignUpData = {
@@ -29,22 +30,23 @@ export type UserFromServer = {
 }
 export type UserPassword = string
 
-//TODO тут еще 500 и 401 коды кроме logout там только 500
+
 class AuthController {
+
+
   static signUp(data: SignUpData): void {
-    AuthApi.signUp(JSON.stringify(data))
-      .then(xhr => {
-        const {id} = JSON.parse(xhr.response) as { id: number }
-        console.log('зарегался пользователь с id:', id);
+    AuthApi.signUp(JSON.stringify(deepEncodeHTML(data)))
+      .then(() => {
         AuthController.getUser(() => {
-          router.go('/messenger')
+          router.go('/')
         })
       })
       .catch(_xhr => {
-        // TODO пользователь уже существует обработка
         const xhr = _xhr as XMLHttpRequest
         const {reason} = JSON.parse(xhr.response) as { reason: string }
-        console.log(reason);
+        if (reason === 'Login already exists') {
+          alert(reason)
+        }
       })
 
   }
@@ -53,20 +55,14 @@ class AuthController {
   static getUser(successCallback?: () => void): void {
     AuthApi.getUser()
       .then(xhr => {
-        const user = JSON.parse(xhr.response) as UserFromServer
-        // console.log(1, store.user);
-        // const user11 = {...store.user}
-        store.userData = {...user}
-        // console.log(2, store.user, user11, store.user === user11);
+        store.userData = deepEncodeHTML(JSON.parse(xhr.response)) as UserFromServer
         if (successCallback === undefined) {
           return
         }
         successCallback()
       })
-      .catch(_xhr => {
-        const xhr = _xhr as XMLHttpRequest
-        store.userData = {...storeUserInitial}
-        console.log('юзер не получился', xhr);
+      .catch(() => {
+        store.userData = {...storeUserInitial.userData}
         router.go('/login')
       })
   }
@@ -77,14 +73,12 @@ class AuthController {
 
 
   static signIn(data: SignInData): void {
-    // jsonData  = ISignInData to json
-    AuthApi.signIn(JSON.stringify(data))
+    AuthApi.signIn(JSON.stringify(deepEncodeHTML(data)))
       .then(xhr => {
         if (xhr.response === 'OK') {
           AuthController.getUser(() => {
-            router.go('/messenger')
+            router.go('/')
           })
-          console.log('юзер залогинился');
         }
       })
       .catch(_xhr => {
@@ -92,23 +86,18 @@ class AuthController {
         const {reason} = JSON.parse(xhr.response) as { reason: string }
         if (reason === 'User already in system') {
           AuthController.getUser(() => {
-            router.go('/messenger')
+            router.go('/')
           })
-        } else if (reason === 'Login or password is incorrect') {
-          //  TODO выкидывать ошибки в форму
+        } else {
+          alert(reason)
         }
       })
   }
 
   static logout(): void {
     AuthApi.logout()
-      .then(xhr => {
-        console.log('юзер разлогинился', xhr);
+      .then(() => {
         router.go('/login')
-      })
-      .catch(_xhr => {
-        const xhr = _xhr as XMLHttpRequest
-        console.log('юзер не разлогинился', xhr);
       })
   }
 

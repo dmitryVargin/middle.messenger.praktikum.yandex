@@ -50,12 +50,9 @@ const passwordInput = new DefaultInput(
       {
         type: 'blur',
         element: 'input',
-        callback(event: InputEvent): void {
-          const target = event.target as HTMLInputElement;
-          // TODO валидация lettersOrNumber чет не работала
-          // const validation = new Validation(target.value);
+        callback(): void {
+          // const target = event.target as HTMLInputElement;
           const isValid = true
-          console.log(target.value, isValid);
           if (!isValid) {
             passwordInput.setValidError();
           } else {
@@ -89,7 +86,7 @@ export const submitButton = new Button(
   buttonTmpl,
 );
 
-// TODO нормальная валидация с доступной кнопкой и onChange
+
 export class Login extends Form {
 }
 

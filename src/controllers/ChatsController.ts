@@ -1,5 +1,6 @@
 import ChatsApi from '../api/ChatsApi';
 import store, {Chats, StoreUser} from '../store/Store';
+import deepEncodeHTML from '../utils/functions/deepEncodeHTML';
 
 
 class ChatController {
@@ -20,27 +21,26 @@ class ChatController {
     }
     ChatsApi.getChats(data)
       .then(xhr => {
-        store.chats = JSON.parse(xhr.response) as Chats
-      })
-      .catch(() => {
+        const chats = deepEncodeHTML(JSON.parse(xhr.response)) as Chats
+        store.chats = chats
+        if (store.activeChat?.id) {
+          store.activeChat = chats.find(chat => chat.id === store.activeChat.id)
+        }
       })
   }
 
   static createChat(title: string): void {
-    ChatsApi.createChat(JSON.stringify({title}))
+    ChatsApi.createChat(JSON.stringify(deepEncodeHTML({title})))
       .then(() => {
         ChatController.getChats()
-      })
-      .catch(() => {
       })
   }
 
-  static deleteChat(chatId: number): void {
-    ChatsApi.deleteChat(JSON.stringify({chatId}))
+  static deleteChat(chatId: number):  Promise<void> {
+    return ChatsApi.deleteChat(JSON.stringify(deepEncodeHTML({chatId})))
       .then(() => {
+        store.activeChat = {}
         ChatController.getChats()
-      })
-      .catch(() => {
       })
   }
 
@@ -49,7 +49,7 @@ class ChatController {
     { offset?: number, limit?: number, name?: string, email?: string }): void {
     ChatsApi.getChatUsersById(id, options)
       .then(xhr => {
-        store.activeChatUsers = JSON.parse(xhr.response) as StoreUser[]
+        store.activeChatUsers = deepEncodeHTML(JSON.parse(xhr.response)) as StoreUser[]
       })
   }
 
@@ -57,17 +57,35 @@ class ChatController {
     return ChatsApi.getNewMessagesCount(id)
   }
 
-  static updateChatAvatar(formData: FormData): void {
-    ChatsApi.updateChatAvatar(formData)
+  static updateChatAvatar(formData: FormData): Promise<void> {
+    return ChatsApi.updateChatAvatar(formData)
+      .then(() => {
+        store.updateMessenger = !store.updateMessenger
+        ChatController.getChats()
+      })
   }
 
   static addUsersToChatById(chatId: number, users: number[]): void {
-    ChatsApi.addUsersToChatById(JSON.stringify({chatId, users}))
+    ChatsApi.addUsersToChatById(JSON.stringify(deepEncodeHTML({chatId, users})))
+      .then(() => {
+        alert('Пользователь добавлен')
+        ChatController.getChats()
+        ChatController.getChatUsersById(chatId)
+      })
   }
 
-  static deleteUserFromChat(chatId: number, users: number[]): void {
-    ChatsApi.deleteUserFromChat(JSON.stringify({chatId, users}))
+  static deleteUserFromChat(chatId: number, users: number[]): Promise<void> {
+    return ChatsApi.deleteUserFromChat(JSON.stringify(deepEncodeHTML({
+      chatId,
+      users
+    })))
+      .then(() => {
+        ChatController.getChats()
+        ChatController.getChatUsersById(chatId)
+      })
   }
 }
 
 export default ChatController
+
+//TODO при добавлении пропадает кружок чата и при удалении пользователя

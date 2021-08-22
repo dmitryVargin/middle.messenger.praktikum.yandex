@@ -4,7 +4,7 @@ export default `
       <div class='close-popup'>+</div>
       <div class='title'>{{title}}</div>
       <form>
-        <div data-component='submitBtn'></div>
+        <div data-component='formElements'></div>
       </form>
     </div>
   </div>`;

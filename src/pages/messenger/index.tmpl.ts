@@ -1,10 +1,11 @@
-import settingIcon from 'url:../../../static/img/settings.svg';
 import plusIcon from 'url:../../../static/img/plus.svg';
 import dotBtn from 'url:../../../static/img/dot-btn.svg';
 import attachIcon from 'url:../../../static/img/attach.svg';
 import userIcon from 'url:../../../static/img/user-icon.svg';
 import camera from 'url:../../../static/img/camera.svg';
 import trash from 'url:../../../static/img/trash.svg';
+import settingIcon from 'url:../../../static/img/settings.svg';
+import {resourcesUrl} from '../../utils/variables';
 
 export default `
   <div class='chat-wrap'>
@@ -27,8 +28,8 @@ export default `
     <div class='chat-content-wrap hidden'>
       <div class='header'>
         <div class='chat-header'>
-          <div class='chat-img'></div>
-          <div class='chat-name'>{{chatName}}</div>
+          <div class='chat-img {{activeChatAvatar}}'><img src="${resourcesUrl}{{activeChat.avatar}}" alt=""></div>
+          <div class='chat-name'>{{activeChat.title}}</div>
         </div>
         <button class='settings-btn img-btn'>
           <div class="settings-popup hidden">
@@ -49,7 +50,6 @@ export default `
         </button>
       </div>
       <div class='content'>
-        <div class='message-date'>19 июня</div>
         <div class='messages'>
           <div data-component='messages'></div>
         </div>

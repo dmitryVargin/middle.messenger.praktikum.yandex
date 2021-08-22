@@ -1,43 +1,8 @@
-function isObject(val: unknown): boolean {
-  return typeof val === 'object' && val !== null && !Array.isArray(val)
-}
-
-type RecordOrArrOfRecord = Record<string, unknown> | Record<string, unknown>[]
-
-function cloneDeep(obj: RecordOrArrOfRecord): RecordOrArrOfRecord {
-  let res: RecordOrArrOfRecord
-  if (Array.isArray(obj)) {
-    res = obj.map(item => {
-      if (isObject(item)) {
-        return cloneDeep(item)
-      }
-      return item
-    })
-  } else {
-    res = {}
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (isObject(obj[key])) {
-          res[key] = cloneDeep(obj[key] as Record<string, unknown>)
-        } else {
-          res[key] = obj[key]
-        }
-      }
-    }
-  }
-
-  return res
-}
-
-export default cloneDeep;
-
-const objects = [{'a': 1}, {'b': 2}];
-const deep = cloneDeep(objects);
-
-console.log(deep);
-
-function cloneDeep<T extends object = object>(obj: T) {
-  return (function _cloneDeep(item: T): T | Date | Set<unknown> | Map<unknown, unknown> | object | T[] {
+function cloneDeep<T>(obj: T): T | Date | Set<unknown> | Map<unknown, unknown>
+  | Record<string, unknown> | T[] {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  return (function _cloneDeep(item: T): T | Date | Set<unknown> |
+    Map<unknown, unknown> | Record<string, unknown> | T[] {
     // Handle:
     // * null
     // * undefined
@@ -59,7 +24,7 @@ function cloneDeep<T extends object = object>(obj: T) {
     // Handle:
     // * Array
     if (item instanceof Array) {
-      const copy = [];
+      const copy:T = [];
 
       item.forEach((_, i) => (copy[i] = _cloneDeep(item[i])));
 
@@ -89,7 +54,7 @@ function cloneDeep<T extends object = object>(obj: T) {
     // Handle:
     // * Object
     if (item instanceof Object) {
-      const copy: object = {};
+      const copy: Record<string, unknown> = {};
 
       // Handle:
       // * Object.symbol

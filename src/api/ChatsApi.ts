@@ -54,7 +54,9 @@ class ChatsApi {
   }
 
   static async deleteUserFromChat(data: string): Promise<XMLHttpRequest> {
-    return http.delete('/users', {data, withCredentials: true})
+    return http.delete('/users', {data, withCredentials: true, headers: {
+        'content-type': 'application/json',
+      },})
   }
 
 }

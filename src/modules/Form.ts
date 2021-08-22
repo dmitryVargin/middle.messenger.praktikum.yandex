@@ -7,7 +7,6 @@ class Form extends Block {
       Object.keys(this.props.components).forEach((key) => {
         if (this.props.components !== undefined) {
           const component = this.props.components[key] ;
-          // TODO тут возможно бага с валидацией
           if (Array.isArray(component)) {
             component.forEach(comp => {
               comp.setProps({

@@ -41,7 +41,6 @@ body {
 
 img {
   max-width: 100%;
-  height: 100%;
 }
 
 
@@ -56,14 +55,15 @@ img {
 
   .title-wrap {
     display: flex;
-    justify-content: space-between;
-
-    .title {
-      margin-right: 15px;
-      margin-bottom: 0;
-    }
+    justify-content: space-evenly;
 
     margin-bottom: 15px;
+
+    .title {
+      align-items: center;
+      display: flex;
+      margin-bottom: 0;
+    }
   }
 
   .title {
@@ -103,24 +103,33 @@ img {
 
 //Chat
 .user-item {
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  margin-bottom: 10px;
 
   .user-info {
-    display: flex;
     align-items: center;
+    display: flex;
   }
 
   .user-avatar {
+    align-items: center;
     border-radius: 50%;
+    display: flex;
     height: 50px;
+    justify-content: center;
     margin-right: 10px;
     width: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+    &.empty {
+      background: $orange;
+    }
   }
+}
+
+.user-item:last-of-type {
+  margin-bottom: 0;
 }
 
 .chat-wrap {
@@ -183,6 +192,10 @@ img {
       background: $user-message-bg;
     }
 
+    .content {
+      max-width: 80%;
+    }
+
     &.active {
       background: $checked-chat-bg;
 
@@ -235,22 +248,23 @@ img {
 
 
     .img {
-      border-radius: 50%;
-      height: 50px;
-      margin-right: 10px;
-      width: 50px;
-      display: flex;
       align-items: center;
+      border-radius: 50%;
+      display: flex;
+      height: 50px;
       justify-content: center;
+      margin-right: 10px;
+      min-width: 50px;
+      max-width: 50px;
 
       &.empty {
         background: $orange;
       }
 
       img {
-        max-width: 100%;
-        height: 100%;
         border-radius: 50%;
+        height: 100%;
+        max-width: 100%;
       }
     }
 
@@ -268,6 +282,10 @@ img {
       font-size: $subtitle-fz;
       line-height: $subtitle-lh;
       padding-right: 25px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
     }
   }
 }
@@ -279,11 +297,11 @@ img {
   width: 100%;
 
   .header {
+    align-items: center;
     border-bottom: 1px solid $lines-color;
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    align-items: center;
   }
 
   .chat-header {
@@ -299,12 +317,23 @@ img {
     }
 
     .chat-img {
-      background: $orange;
       border-radius: 50%;
       height: 40px;
       margin-right: 10px;
-
       width: 40px;
+
+      img {
+        border-radius: 50%;
+        height: 100%;
+      }
+
+      &.empty {
+        background: $orange;
+
+        img {
+          display: none;
+        }
+      }
     }
 
 
@@ -315,14 +344,14 @@ img {
   }
 
   .settings-popup {
-    padding: 10px 15px;
-    top: 45px;
-    right: 0;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.14);
-    border-radius: 12px;
-    position: absolute;
-    z-index: 3;
     background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.14);
+    padding: 10px 15px;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    z-index: 3;
     //display: none;
 
     .img-btn {
@@ -471,10 +500,10 @@ img {
   }
 
   .img-wrap {
-    cursor: pointer;
     align-items: center;
     background: #e1ebf1;
     border-radius: 50%;
+    cursor: pointer;
     display: flex;
     height: 100px;
     justify-content: center;
@@ -587,8 +616,8 @@ img {
   position: relative;
 
   .input-inner-wrap {
-    display: flex;
     align-items: center;
+    display: flex;
   }
 
   &.fullwidth {
@@ -668,9 +697,9 @@ img {
   display: flex;
   height: 50px;
   justify-content: center;
+  margin: 0 auto;
   max-width: 280px;
   width: 100%;
-  margin: 0 auto;
 
   &:hover {
     box-shadow: none;

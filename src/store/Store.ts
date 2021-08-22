@@ -1,25 +1,8 @@
 import EventBus from '../utils/classes/EventBus';
-import cloneDeep from '../utils/functions/cloneDeep';
 import isPlainObject from '../utils/functions/isPlainObject';
 import {MessageObj} from '../pages/messenger';
+import {defaultAvatar} from '../utils/variables';
 
-
-export class Store {
-  private store = {}
-
-  private static __instance: Store
-
-  constructor() {
-    if (Store.__instance) {
-      return Store.__instance;
-    }
-  }
-
-  public getStore() {
-    return this.store
-  }
-
-}
 
 export type Chat = {
   'id': number,
@@ -33,7 +16,8 @@ export type Chat = {
       'avatar': string,
       'email': string,
       'login': string,
-      'phone': string
+      'phone': string,
+      display_name: string,
     },
     'time': string,
     'content': string
@@ -59,12 +43,15 @@ export type TStore = {
   chats: Chat[],
   activeChat: Chat | Record<string, unknown>,
   activeChatUsers: StoreUser[] | [],
+  searchUserInput: string,
   searchUserList: StoreUser[] | [],
-  activeChatMessages: MessageObj[]
+  activeChatMessages: MessageObj[],
+  activeChatAvatar: string,
+  updateMessenger: boolean,
 }
-const defaultAvatar = 'https://ya-praktikum.tech/api/v2/resources//a16d7fcd-f5fa-468e-afd6-3f9666999c8b/073c838f-acdb-4d84-8edd-1d5313cd02a7_profile.jpg'
 
 export const storeUserInitial = {
+  updateMessenger: false,
   userData: {
     id: null,
     first_name: '',
@@ -77,9 +64,11 @@ export const storeUserInitial = {
   },
   chats: [],
   activeChat: {},
+  searchUserInput:'',
   activeChatUsers: [],
   searchUserList: [],
-  activeChatMessages: []
+  activeChatMessages: [],
+  activeChatAvatar: '',
 }
 
 
@@ -97,21 +86,21 @@ export type ChatObj = {
 };
 
 const store = new Proxy(storeObj, {
-  get: (target, prop: string) => {
+  get: (target, prop: keyof TStore) => {
     const value = target[prop];
     if (typeof value === 'function') {
-      return value.bind(target)
+      const typedValue = value as () => any
+      return typedValue.bind(target)
     }
     return value
   },
-  set: (target, prop: string, value: any) => {
-    if (typeof target[prop] === 'object') {
-      const innerValue = isPlainObject(value) ? {...value} : value
-      target[prop] = innerValue
+  set: (target, prop: keyof TStore, value: any) => {
+    if (isPlainObject(value)) {
+      target[prop] = {...value}
     } else {
       target[prop] = value;
     }
-    console.log(prop,'стор изменился', store);
+    console.log(prop, 'изменился в сторе');
     storeEventBus.emit(prop, {...store})
     return true;
   },

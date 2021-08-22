@@ -1,4 +1,4 @@
-import isObject from './isObject';
+import isPlainObject from './isPlainObject';
 
 type Indexed<T = unknown> = {
   [key in string]: T;
@@ -11,7 +11,7 @@ function merge(lhs: Indexed, rhs: Indexed): Indexed {
     if (!rhs.hasOwnProperty(key)) {
       continue;
     }
-    if (isObject(lhs[key])) {
+    if (isPlainObject(lhs[key])) {
       lhs[key] = merge(lhs[key] as Indexed, rhs[key] as Indexed)
     } else {
       lhs[key] = rhs[key]

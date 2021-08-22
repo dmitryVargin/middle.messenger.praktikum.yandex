@@ -7,7 +7,7 @@ import signupTmpl from './pages/signup/index.tmpl';
 import {Profile, profileProps} from './pages/profile';
 import profileTmpl from './pages/profile/index.tmpl';
 
-import {Messenger, chatList, messengerProps, messages} from './pages/messenger';
+import {Messenger, messengerProps} from './pages/messenger';
 import chatTmpl from './pages/messenger/index.tmpl';
 
 
@@ -19,6 +19,9 @@ import Block, {Props} from './modules/Block/Block';
 import Router from './utils/classes/Router';
 
 import {storeEventBus} from './store/Store';
+import messages from './components/Messages';
+import userListPopup from './components/popups/ChatUserListPopup';
+import chatUserAddPopup from './components/popups/ChatUserAddPopup';
 
 const routesToElem: {
   [key: string]: {
@@ -36,7 +39,7 @@ const routesToElem: {
     value: null,
     tmpl: chatTmpl,
     isProtected: true,
-    listenedStoreField: ['chats'],
+    listenedStoreField: ['chats', 'activeChat', 'updateMessenger'],
   },
   '/login': {
     Class: Login,
@@ -79,10 +82,13 @@ Object.keys(routesToElem).forEach((routeInfo) => {
   const block = new Class(props, tmpl)
   router.use(routeInfo, block, isProtected)
   listenedStoreField.forEach((field) => {
-    storeEventBus.on(field, block.setProps.bind(block))
+    const callback = block.setProps.bind(block)
+    storeEventBus.on(field, callback)
   })
 })
 storeEventBus.on('activeChatMessages', messages.setProps.bind(messages))
+storeEventBus.on('activeChatUsers', userListPopup.setProps.bind(userListPopup))
+storeEventBus.on('searchUserList', chatUserAddPopup.setProps.bind(chatUserAddPopup))
 
 router.use('errorPage', new ErrorPage({
   error: {

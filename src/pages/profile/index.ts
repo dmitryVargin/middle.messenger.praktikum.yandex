@@ -2,20 +2,18 @@ import ArrowButton from '../../components/ArrowButton/index';
 import arrowButtonTmpl from '../../components/ArrowButton/index.tmpl';
 import Block from '../../modules/Block/Block';
 import {router} from '../../index';
-import EditFieldPopup from '../../components/popups/EditFieldPopup';
 import editFieldPopupTmpl
-  from '../../components/popups/EditFieldPopup/index.tmpl';
-import editPasswordPopupTmpl
-  from '../../components/popups/EditPasswordPopup/index.tmpl';
+  from '../../components/popups/FormPopup/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Button from '../../components/Button';
 import buttonTmpl from '../../components/Button/index.tmpl';
 import {checkValidationByTemplate} from '../../utils/classes/Validation';
 import AuthController, {UserFromServer} from '../../controllers/AuthController';
-import store, {StoreUser, TStore} from '../../store/Store';
+import store, {TStore} from '../../store/Store';
 import UserContoller from '../../controllers/UserContoller';
 import getObjFromFormData from '../../utils/functions/getObjFromFormData';
+import FormPopup from '../../components/popups/FormPopup';
 
 const arrowBtn = new ArrowButton(
   {
@@ -31,7 +29,7 @@ const arrowBtn = new ArrowButton(
         element: 'root',
         'data-path': {
           type: 'set',
-          value: '/messenger',
+          value: '/',
         },
       },
     ],
@@ -123,11 +121,9 @@ function openEditFieldPopup(fieldName: string) {
         defaultInputTmpl,
       );
       components = {
-        input: [oldPasswordInput, newPasswordInput],
-        submitBtn,
+        formElements: [oldPasswordInput, newPasswordInput, submitBtn],
       }
     } else if (fieldName === 'avatar') {
-      // TODO  стилизация input type file
       const input = new DefaultInput(
         {
           label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
@@ -154,11 +150,9 @@ function openEditFieldPopup(fieldName: string) {
         defaultInputTmpl,
       );
       components = {
-        input,
-        submitBtn,
+        formElements: [input, submitBtn],
       }
     }
-
   } else {
     const input = new DefaultInput(
       {
@@ -187,13 +181,12 @@ function openEditFieldPopup(fieldName: string) {
       defaultInputTmpl,
     );
     components = {
-      input,
-      submitBtn,
+      formElements: [input, submitBtn],
     }
   }
 
 
-  const editPopup = new EditFieldPopup(
+  const editPopup = new FormPopup(
     {
       title: 'Редактировать поле',
       components,
@@ -223,7 +216,7 @@ function openEditFieldPopup(fieldName: string) {
                   AuthController.getUser()
                 })
                 .catch(() => {
-                  //TODO ошибка апдейта поля
+                  alert(`Не удалось обновить поле ${fieldName}`)
                 })
             }
             // @ts-ignore

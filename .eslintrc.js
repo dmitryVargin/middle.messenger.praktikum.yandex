@@ -57,14 +57,6 @@ module.exports = {
     'import/no-unresolved': 'off',
     'no-prototype-builtins': 'off',
     'import/prefer-default-export': 'off',
-    'no-use-before-define': [
-      'error',
-      {
-        functions: false,
-        classes: false,
-        variables: true,
-      },
-    ],
     '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/no-this-alias': 'warn',
     '@typescript-eslint/no-unsafe-return': 'warn',
@@ -76,7 +68,7 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/no-use-before-define': [
       'error',
-      {functions: false, classes: true, variables: true, typedefs: true},
+      {functions: false, classes: true, variables: true, typedefs: false},
     ],
   },
 };
