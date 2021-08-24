@@ -51,7 +51,6 @@ const passwordInput = new DefaultInput(
         type: 'blur',
         element: 'input',
         callback(): void {
-          // const target = event.target as HTMLInputElement;
           const isValid = true
           if (!isValid) {
             passwordInput.setValidError();

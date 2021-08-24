@@ -14,6 +14,7 @@ export type RequestOptions = {
   timeout?: number
   withCredentials?: boolean
   data?: Data
+  headers?: Record<string, any>
   [key: string]: any
 };
 
@@ -24,7 +25,7 @@ class HTTP {
     this.url = url
   }
 
-  get = (url: string, options: RequestOptions = {}) =>
+  get = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> =>
     this.request(
       url,
       {
@@ -34,7 +35,7 @@ class HTTP {
       options.timeout,
     );
 
-  post = (url: string, options: RequestOptions = {}) =>
+  post = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> =>
     this.request(
       url,
       {
@@ -44,7 +45,7 @@ class HTTP {
       options.timeout,
     );
 
-  put = (url: string, options: RequestOptions = {}) =>
+  put = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> =>
     this.request(
       url,
       {
@@ -54,7 +55,7 @@ class HTTP {
       options.timeout,
     );
 
-  delete = (url: string, options: RequestOptions = {}) =>
+  delete = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> =>
     this.request(
       url,
       {
@@ -69,7 +70,7 @@ class HTTP {
 
     return new Promise((resolve, reject) => {
       if (!method) {
-        reject('No method');
+        reject(new Error('No method'));
         return;
       }
 
@@ -80,7 +81,7 @@ class HTTP {
 
       xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data as PlainObject)}` : this.url + url);
 
-      Object.keys(headers).forEach((key) => {
+      (Object.keys(headers)).forEach((key) => {
         xhr.setRequestHeader(key, headers[key]);
       });
 

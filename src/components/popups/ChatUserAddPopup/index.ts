@@ -3,7 +3,7 @@ import DefaultInput from '../../DefaultInput';
 import UserContoller from '../../../controllers/UserContoller';
 import store, {StoreUser, TStore} from '../../../store/Store';
 import searchInputTmpl from '../../searchInput/index.tmpl';
-import {resourcesUrl} from '../../../utils/variables';
+import {resourcesUrl} from '../../../constants/urls';
 import Block from '../../../modules/Block/Block';
 import getObjFromFormData from '../../../utils/functions/getObjFromFormData';
 import chatUserAddPopupTmpl from './index.tmpl';
@@ -45,10 +45,10 @@ const userItemTemplator = ({
                              avatar
                            }: StoreUser) => `<div class="user-item">
             <div class="user-info">
-              <div class="user-avatar"><img src="${resourcesUrl}${avatar}" alt=""></div>
+              <div class="user-avatar"><img src="${resourcesUrl}${avatar || ''}" alt=""></div>
               <div>${first_name} ${second_name}</div>
             </div>
-            <input name="user-${id}" type="checkbox">
+            <input name="user-${id as number}" type="checkbox">
           </div>`
 
 const userList = store.searchUserList.map((user) => new Block({}, userItemTemplator(user)))
@@ -67,7 +67,7 @@ class ChatUserAddPopup extends Form {
   }
 
   afterRender() {
-    this.element.querySelector('input').focus()
+    this.element.querySelector('input')?.focus()
   }
 }
 
@@ -94,19 +94,15 @@ const chatUserAddPopup = new ChatUserAddPopup({
           }
         })
         ChatController.addUsersToChatById(store.activeChat.id as number, userIds)
-        // @ts-ignore
-        // this.destroy();
       },
     },
     {
       type: 'click',
       element: '.close-popup',
-      callback() {
-        // @ts-ignore
+      callback(this: ChatUserAddPopup) {
         store.searchUserList = []
         store.searchUserInput = ''
         this.destroy();
-
       },
     },
   ],

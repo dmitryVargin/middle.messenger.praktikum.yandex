@@ -1,4 +1,4 @@
-type CallbackArgs = any[];
+type CallbackArgs = unknown[];
 type Callback = (...args: CallbackArgs) => void;
 type Event = string;
 

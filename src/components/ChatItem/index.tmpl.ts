@@ -1,4 +1,4 @@
-import {resourcesUrl} from '../../utils/variables';
+import {resourcesUrl} from '../../constants/urls';
 import {Chat} from '../../store/Store';
 
 
@@ -8,7 +8,7 @@ const chatItemTemplator = ({
                              title,
                              unread_count,
                              last_message
-                           }: Chat) => {
+                           }: Chat):string => {
   let innerLastMessage
   if (last_message?.user?.display_name) {
     innerLastMessage = `<span class='own-msg'>${last_message?.user?.display_name} :</span><span>${last_message.content}</span>`

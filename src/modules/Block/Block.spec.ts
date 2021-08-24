@@ -28,8 +28,7 @@ const someProps = {
     {
       type: 'click',
       element: 'root',
-      callback() {
-        // @ts-ignore
+      callback(this: Block) {
         this.setProps({
           attributes: [
             {

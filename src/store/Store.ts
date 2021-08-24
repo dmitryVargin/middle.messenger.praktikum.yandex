@@ -1,7 +1,7 @@
 import EventBus from '../utils/classes/EventBus';
 import isPlainObject from '../utils/functions/isPlainObject';
-import {MessageObj} from '../pages/messenger';
-import {defaultAvatar} from '../utils/variables';
+import {defaultAvatar} from '../constants/urls';
+import {MessageObj} from '../components/Messages';
 
 
 export type Chat = {
@@ -64,7 +64,7 @@ export const storeUserInitial = {
   },
   chats: [],
   activeChat: {},
-  searchUserInput:'',
+  searchUserInput: '',
   activeChatUsers: [],
   searchUserList: [],
   activeChatMessages: [],
@@ -84,23 +84,27 @@ export type ChatObj = {
   unread_count: number;
   last_message: string;
 };
+type StoreKeys = keyof TStore
+type StoreValues = TStore[StoreKeys]
 
 const store = new Proxy(storeObj, {
   get: (target, prop: keyof TStore) => {
     const value = target[prop];
     if (typeof value === 'function') {
-      const typedValue = value as () => any
-      return typedValue.bind(target)
+      return (value as () => any).bind(target)
     }
     return value
   },
-  set: (target, prop: keyof TStore, value: any) => {
+  set: (target, prop: StoreKeys, value: StoreValues) => {
     if (isPlainObject(value)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       target[prop] = {...value}
     } else {
+      // @ts-ignore
       target[prop] = value;
     }
-    console.log(prop, 'изменился в сторе');
     storeEventBus.emit(prop, {...store})
     return true;
   },

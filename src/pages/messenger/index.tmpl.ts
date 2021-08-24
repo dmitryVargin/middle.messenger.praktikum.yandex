@@ -5,7 +5,7 @@ import userIcon from 'url:../../../static/img/user-icon.svg';
 import camera from 'url:../../../static/img/camera.svg';
 import trash from 'url:../../../static/img/trash.svg';
 import settingIcon from 'url:../../../static/img/settings.svg';
-import {resourcesUrl} from '../../utils/variables';
+import {resourcesUrl} from '../../constants/urls';
 
 export default `
   <div class='chat-wrap'>

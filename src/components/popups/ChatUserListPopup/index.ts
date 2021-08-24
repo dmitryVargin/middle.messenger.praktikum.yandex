@@ -1,5 +1,5 @@
 import Form from '../../../modules/Form';
-import {resourcesUrl} from '../../../utils/variables';
+import {resourcesUrl} from '../../../constants/urls';
 import CloseCircleButton from '../../CloseCircleButton';
 import closeCircleButtonTmpl from '../../CloseCircleButton/index.tmpl';
 import store, {StoreUser, TStore} from '../../../store/Store';
@@ -18,7 +18,7 @@ const userItemTemplator = ({
                              first_name,
                              second_name,
                              avatar
-                           }: StoreUser) => `<div data-id="${id}" class="user-item">
+                           }: StoreUser) => `<div data-id="${id as number}" class="user-item">
                           <div  class="user-info">
                             <div class="user-avatar ${avatar || 'empty'}"><img src="${resourcesUrl}${avatar || ''}" alt=""></div>
                             <div>${first_name} ${second_name}</div>
@@ -125,28 +125,25 @@ const userListPopup = new UserListPopup(
       {
         type: 'submit',
         element: 'form',
-        callback(event: Event) {
+        callback(this: UserListPopup, event: Event) {
           event.preventDefault();
           const target = event.target as HTMLFormElement;
           const formData = new FormData(target)
           console.log(getObjFromFormData(formData));
-          // @ts-ignore
           this.destroy();
         },
       },
       {
         type: 'click',
         element: '.close-popup',
-        callback() {
-          // @ts-ignore
+        callback(this: UserListPopup) {
           this.destroy();
         },
       },
       {
         type: 'click',
         element: '.add-user-btn',
-        callback() {
-          // @ts-ignore
+        callback(this: UserListPopup) {
           document.body.append(chatUserAddPopup.getContent());
           this.destroy();
         }

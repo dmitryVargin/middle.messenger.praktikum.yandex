@@ -24,8 +24,10 @@ function cloneDeep<T>(obj: T): T | Date | Set<unknown> | Map<unknown, unknown>
     // Handle:
     // * Array
     if (item instanceof Array) {
+      // @ts-ignore
       const copy:T = [];
 
+      // @ts-ignore
       item.forEach((_, i) => (copy[i] = _cloneDeep(item[i])));
 
       return copy;
@@ -58,10 +60,12 @@ function cloneDeep<T>(obj: T): T | Date | Set<unknown> | Map<unknown, unknown>
 
       // Handle:
       // * Object.symbol
+      // @ts-ignore
       Object.getOwnPropertySymbols(item).forEach(s => (copy[s] = _cloneDeep(item[s])));
 
       // Handle:
       // * Object.name (other)
+      // @ts-ignore
       Object.keys(item).forEach(k => (copy[k] = _cloneDeep(item[k])));
 
       return copy;

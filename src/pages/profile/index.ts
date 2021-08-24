@@ -49,10 +49,8 @@ const arrowBtn = new ArrowButton(
 );
 
 export class Profile extends Block {
-  componentDidMount() {
-    setTimeout(() => {
-      AuthController.getUser()
-    }, 100)
+  componentDidMount(): void {
+    AuthController.getUser()
   }
 }
 
@@ -194,7 +192,7 @@ function openEditFieldPopup(fieldName: string) {
         {
           type: 'submit',
           element: 'form',
-          callback(event: Event) {
+          callback(this: FormPopup, event: Event) {
             event.preventDefault();
             if (specificPopup) {
               if (fieldName === 'password') {
@@ -205,6 +203,12 @@ function openEditFieldPopup(fieldName: string) {
                 UserContoller.updateUserPassword(oldPassword, newPassword)
               } else if (fieldName === 'avatar') {
                 UserContoller.updateProfileAvatar(new FormData(event.target as HTMLFormElement))
+                  .then(() => {
+                    AuthController.getUser()
+                  })
+                  .catch(() => {
+                    alert(`Не удалось обновить поле ${fieldName}`)
+                  })
               }
             } else {
               const userData = {
@@ -219,15 +223,13 @@ function openEditFieldPopup(fieldName: string) {
                   alert(`Не удалось обновить поле ${fieldName}`)
                 })
             }
-            // @ts-ignore
             this.destroy();
           },
         },
         {
           type: 'click',
           element: '.close-popup',
-          callback() {
-            // @ts-ignore
+          callback(this: FormPopup) {
             this.destroy();
           },
         },

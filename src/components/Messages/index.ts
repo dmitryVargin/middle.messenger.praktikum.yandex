@@ -8,7 +8,16 @@ export type MessageObj = {
   time: Date;
   user_id: string
   content: string
-  type: 'message'
+  type: string
+  file?: {
+    id: number,
+    user_id: number,
+    path: string,
+    filename: string,
+    content_type: string,
+    content_size: number,
+    upload_date: string,
+  }
 };
 
 class Messages extends Block {
@@ -22,8 +31,6 @@ class Messages extends Block {
         messages,
       }
     });
-    document.querySelector('.empty-chat')?.classList.add('hidden');
-    document.querySelector('.chat-content-wrap')?.classList.remove('hidden');
   }
 }
 

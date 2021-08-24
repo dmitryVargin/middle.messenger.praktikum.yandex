@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function isEmpty(value: any): boolean {
   if (value === null) {
     return true;
@@ -6,7 +7,7 @@ function isEmpty(value: any): boolean {
     return value.length === 0;
   }
   if (typeof value === 'object') {
-    if (value.size !== undefined) {
+    if (value instanceof Set || value instanceof Map) {
       return value.size === 0;
     }
     if (Array.isArray(value)) {

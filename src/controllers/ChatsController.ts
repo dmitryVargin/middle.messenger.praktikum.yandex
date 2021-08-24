@@ -1,5 +1,5 @@
 import ChatsApi from '../api/ChatsApi';
-import store, {Chats, StoreUser} from '../store/Store';
+import store, {Chat, Chats, StoreUser} from '../store/Store';
 import deepEncodeHTML from '../utils/functions/deepEncodeHTML';
 
 
@@ -13,10 +13,10 @@ class ChatController {
     if (offset) {
       data.offset = offset
     }
-    if (offset) {
+    if (limit) {
       data.limit = limit
     }
-    if (offset) {
+    if (title) {
       data.title = title
     }
     ChatsApi.getChats(data)
@@ -24,7 +24,7 @@ class ChatController {
         const chats = deepEncodeHTML(JSON.parse(xhr.response)) as Chats
         store.chats = chats
         if (store.activeChat?.id) {
-          store.activeChat = chats.find(chat => chat.id === store.activeChat.id)
+          store.activeChat = chats.find(chat => chat.id === store.activeChat.id) as Chat
         }
       })
   }
@@ -36,8 +36,8 @@ class ChatController {
       })
   }
 
-  static deleteChat(chatId: number):  Promise<void> {
-    return ChatsApi.deleteChat(JSON.stringify(deepEncodeHTML({chatId})))
+  static deleteChat(chatId: number): void {
+     ChatsApi.deleteChat(JSON.stringify(deepEncodeHTML({chatId})))
       .then(() => {
         store.activeChat = {}
         ChatController.getChats()
@@ -57,8 +57,8 @@ class ChatController {
     return ChatsApi.getNewMessagesCount(id)
   }
 
-  static updateChatAvatar(formData: FormData): Promise<void> {
-    return ChatsApi.updateChatAvatar(formData)
+  static updateChatAvatar(formData: FormData): void {
+    ChatsApi.updateChatAvatar(formData)
       .then(() => {
         store.updateMessenger = !store.updateMessenger
         ChatController.getChats()
@@ -88,4 +88,3 @@ class ChatController {
 
 export default ChatController
 
-//TODO при добавлении пропадает кружок чата и при удалении пользователя
