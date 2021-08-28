@@ -1,27 +1,25 @@
 import isPlainObject from './isPlainObject';
 import encodeHTML from './encodeHTML';
 
-function deepEncodeHTML(data: string | [] | Record<string, any>): string | [] | Record<string, any> {
-  let res = data
+function deepEncodeHTML(data: string | any[] | Record<string, any>): string | any[] | Record<string, any> {
+  let res = data;
   if (typeof data === 'string') {
-    res = encodeHTML(data)
+    res = encodeHTML(data);
   }
   if (Array.isArray(data)) {
-    res = data.map(el => deepEncodeHTML(el))
+    res = data.map((el) => deepEncodeHTML(el));
   }
   if (isPlainObject(data)) {
-    res = {}
-    if (typeof data === 'object') {
-      for (const key in data) {
-        if (data.hasOwnProperty(key)) {
-          if (!(data instanceof Array)) {
-            res[key] = deepEncodeHTML(data[key])
-          }
+    res = {};
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        if (!(data instanceof Array)) {
+          res[key] = deepEncodeHTML(data[key]);
         }
       }
     }
   }
-  return res
+  return res;
 }
 
-export default deepEncodeHTML
+export default deepEncodeHTML;
