@@ -1,27 +1,18 @@
 
 Учебный проект - messenger
-Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/1
-### Ветка, в которой делаете задания спринта, должна называться sprint_i, где i - номер спринта. Не переименовывайте её.
 
 Прототип: https://www.figma.com/file/nVtwoB3MtIj3BIqv822xtd/Prototypes?node-id=0%3A1
 
 Netlify https://adoring-morse-4ee1ae.netlify.app/
 
-Запуск: npm run start
+Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/3
 
-Разработка: npm run dev
+Кровью и потом, с большой просрочкой - минимально реализован функционал.
+Точно остались баги, лишние ререндеры и запросы.
+Обработаны не все исключения.
 
-Билд: npm run build
+Финализировать буду на 4 спринте, слишком сильно застрял с этим.
 
-Создано временное навигационное меню.
 
-Попапы готовы частично.
 
-Сделано много заглушек для последующего подключения к API, встречаются много спорных моментов и моков связанных с этим (страница chat).
 
-Слабо типизированы функции, которые принимают и возвращают любые параметры (Вроде get).
-
-Не решены проблемы типизации в местах использования детьми родительских методов, например, использование
-Form.checkFormValid из дочернего класса DefaultInput.
-
-Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/2

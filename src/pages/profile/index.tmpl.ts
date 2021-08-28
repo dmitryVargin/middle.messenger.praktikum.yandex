@@ -5,9 +5,9 @@ export default `
     </div>
     <div class='profile'>
       <div class='img-wrap'>
-        <img src='{{userData.avatar}}' alt='avatar' class='profile-img'>
+        <img data-field='avatar' src='https://ya-praktikum.tech/api/v2/resources/{{userData.avatar}}' alt='avatar' class='profile-img'>
       </div>
-      <h3>Иван</h3>
+      <h3>{{userData.display_name}}</h3>
       <div class='row'>
         <p data-field='email' class='field-name'>Email</p>
         <p class='field-value'>{{userData.email}}</p>
@@ -36,6 +36,6 @@ export default `
         <p data-field='phone' class='field-name'>Phone number</p>
         <p class='field-value'>{{userData.phone}}</p>
       </div>
-      <a data-path='/login' class='link warning' href='#'>log out</a>
+      <a data-logout class='link warning'>log out</a>
     </div>
   </div>`;

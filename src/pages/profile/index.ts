@@ -1,15 +1,19 @@
 import ArrowButton from '../../components/ArrowButton/index';
 import arrowButtonTmpl from '../../components/ArrowButton/index.tmpl';
-import Block from '../../utils/Block';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
-import EditFieldPopup from '../../components/popups/EditFieldPopup';
-import editFieldPopupTmpl from '../../components/popups/EditFieldPopup/index.tmpl';
+import Block from '../../modules/Block/Block';
+import {router} from '../../index';
+import editFieldPopupTmpl
+  from '../../components/popups/FormPopup/index.tmpl';
 import DefaultInput from '../../components/DefaultInput';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Button from '../../components/Button';
 import buttonTmpl from '../../components/Button/index.tmpl';
-import { checkValidationByTemplate } from '../../utils/Validation';
+import {checkValidationByTemplate} from '../../utils/classes/Validation';
+import AuthController, {UserFromServer} from '../../controllers/AuthController';
+import store, {TStore} from '../../store/Store';
+import UserContoller from '../../controllers/UserContoller';
+import getObjFromFormData from '../../utils/functions/getObjFromFormData';
+import FormPopup from '../../components/popups/FormPopup';
 
 const arrowBtn = new ArrowButton(
   {
@@ -25,7 +29,7 @@ const arrowBtn = new ArrowButton(
         element: 'root',
         'data-path': {
           type: 'set',
-          value: '/chat',
+          value: '/',
         },
       },
     ],
@@ -34,7 +38,9 @@ const arrowBtn = new ArrowButton(
         type: 'click',
         element: 'root',
         callback(event: Event) {
-          historyPush(event, appRerender);
+          const target = event.target as HTMLElement;
+          const {path} = target.dataset;
+          router.go(path as string)
         },
       },
     ],
@@ -43,51 +49,16 @@ const arrowBtn = new ArrowButton(
 );
 
 export class Profile extends Block {
-  componentDidMount() {
-    //like fetch
-    setTimeout(() => {
-      this.setProps({
-        userData: {
-          avatar: '',
-          email: 'example@email.com',
-          login: 'some_login',
-          first_name: 'John',
-          second_name: 'Doe',
-          display_name: 'Johny',
-          phone: '+7-123-456-78-90',
-        },
-      });
-    }, 1000);
+  componentDidMount(): void {
+    AuthController.getUser()
   }
 }
 
-function openPopup(fieldName: string) {
-  const inputValue = 'Some value from store';
-  const input = new DefaultInput(
-    {
-      label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
-      type: 'text',
-      placeholder: inputValue,
-      name: fieldName,
-      errorText: `Wrong ${fieldName}`,
-      events: [
-        {
-          type: 'blur',
-          element: 'input',
-          callback(event: InputEvent) {
-            const target = event.target as HTMLInputElement;
-            const isValid = checkValidationByTemplate(fieldName, target.value);
-            if (!isValid) {
-              input.setValidError();
-            } else {
-              input.setValid();
-            }
-          },
-        },
-      ],
-    },
-    defaultInputTmpl,
-  );
+function openEditFieldPopup(fieldName: string) {
+  const {userData} = store
+  const inputValue = userData[fieldName as keyof TStore['userData']]
+  const specificPopup = fieldName === 'password' || fieldName === 'avatar'
+  let components = {}
   const submitBtn = new Button(
     {
       type: 'submit',
@@ -95,36 +66,171 @@ function openPopup(fieldName: string) {
     },
     buttonTmpl,
   );
-  const editPopup = new EditFieldPopup(
+  if (specificPopup) {
+    if (fieldName === 'password') {
+      const oldPasswordInput = new DefaultInput(
+        {
+          label: 'Old password',
+          type: 'password',
+          name: 'oldPassword',
+          errorText: `Wrong ${fieldName}`,
+          events: [
+            {
+              type: 'blur',
+              element: 'input',
+              callback(event: InputEvent) {
+                const target = event.target as HTMLInputElement;
+                const isValid = true
+                checkValidationByTemplate(fieldName, target.value);
+                if (!isValid) {
+                  oldPasswordInput.setValidError();
+                } else {
+                  oldPasswordInput.setValid();
+                }
+              },
+            },
+          ],
+        },
+        defaultInputTmpl,
+      );
+      const newPasswordInput = new DefaultInput(
+        {
+          label: 'New password',
+          type: 'password',
+          name: 'newPassword',
+          errorText: `Wrong ${fieldName}`,
+          events: [
+            {
+              type: 'blur',
+              element: 'input',
+              callback(event: InputEvent) {
+                const target = event.target as HTMLInputElement;
+                const isValid = true
+                checkValidationByTemplate(fieldName, target.value);
+                if (!isValid) {
+                  newPasswordInput.setValidError();
+                } else {
+                  newPasswordInput.setValid();
+                }
+              },
+            },
+          ],
+        },
+        defaultInputTmpl,
+      );
+      components = {
+        formElements: [oldPasswordInput, newPasswordInput, submitBtn],
+      }
+    } else if (fieldName === 'avatar') {
+      const input = new DefaultInput(
+        {
+          label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
+          type: 'file',
+          name: fieldName,
+          errorText: `Wrong ${fieldName}`,
+          events: [
+            {
+              type: 'blur',
+              element: 'input',
+              callback(event: InputEvent) {
+                const target = event.target as HTMLInputElement;
+                const isValid = true
+                checkValidationByTemplate(fieldName, target.value);
+                if (!isValid) {
+                  input.setValidError();
+                } else {
+                  input.setValid();
+                }
+              },
+            },
+          ],
+        },
+        defaultInputTmpl,
+      );
+      components = {
+        formElements: [input, submitBtn],
+      }
+    }
+  } else {
+    const input = new DefaultInput(
+      {
+        label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
+        type: 'text',
+        value: inputValue,
+        name: fieldName,
+        errorText: `Wrong ${fieldName}`,
+        events: [
+          {
+            type: 'blur',
+            element: 'input',
+            callback(event: InputEvent) {
+              const target = event.target as HTMLInputElement;
+              const isValid = true
+              checkValidationByTemplate(fieldName, target.value);
+              if (!isValid) {
+                input.setValidError();
+              } else {
+                input.setValid();
+              }
+            },
+          },
+        ],
+      },
+      defaultInputTmpl,
+    );
+    components = {
+      formElements: [input, submitBtn],
+    }
+  }
+
+
+  const editPopup = new FormPopup(
     {
       title: 'Редактировать поле',
-      components: {
-        input,
-        submitBtn,
-      },
+      components,
       events: [
         {
           type: 'submit',
           element: 'form',
-          callback(event: Event) {
+          callback(this: FormPopup, event: Event) {
             event.preventDefault();
-            const formData = new FormData(event.target as HTMLFormElement);
-            const formDataObj: Record<string, unknown> = {};
-            // eslint-disable-next-line no-restricted-syntax
-            for (const [name, value] of formData) {
-              formDataObj[name] = value;
+            if (specificPopup) {
+              if (fieldName === 'password') {
+                const {
+                  oldPassword,
+                  newPassword
+                } = getObjFromFormData(new FormData(event.target as HTMLFormElement))
+                UserContoller.updateUserPassword(oldPassword, newPassword)
+              } else if (fieldName === 'avatar') {
+                UserContoller.updateProfileAvatar(new FormData(event.target as HTMLFormElement))
+                  .then(() => {
+                    AuthController.getUser()
+                  })
+                  .catch(() => {
+                    alert(`Не удалось обновить поле ${fieldName}`)
+                  })
+              }
+            } else {
+              const userData = {
+                ...store.userData as UserFromServer,
+                ...getObjFromFormData(new FormData(event.target as HTMLFormElement)),
+              }
+              UserContoller.updateProfile(userData)
+                .then(() => {
+                  AuthController.getUser()
+                })
+                .catch(() => {
+                  alert(`Не удалось обновить поле ${fieldName}`)
+                })
             }
-            console.log(formDataObj);
-            // @ts-ignore
-            this.destroyElem();
+            this.destroy();
           },
         },
         {
           type: 'click',
           element: '.close-popup',
-          callback() {
-            // @ts-ignore
-            this.destroyElem();
+          callback(this: FormPopup) {
+            this.destroy();
           },
         },
       ],
@@ -145,14 +251,14 @@ export const profileProps = {
       callback(event: Event): void {
         const field = event.target as HTMLFormElement;
         const fieldName = field.dataset.field as string;
-        openPopup(fieldName);
+        openEditFieldPopup(fieldName);
       },
     },
     {
       type: 'click',
-      element: '[data-path]',
-      callback(event: Event): void {
-        historyPush(event, appRerender);
+      element: '[data-logout]',
+      callback(): void {
+        AuthController.logout()
       },
     },
   ],

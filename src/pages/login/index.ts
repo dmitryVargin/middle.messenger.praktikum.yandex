@@ -4,12 +4,16 @@ import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
 import Button from '../../components/Button/index';
 import buttonTmpl from '../../components/Button/index.tmpl';
 
-import { Props } from '../../utils/Block';
-import Validation from '../../utils/Validation';
+import {Props} from '../../modules/Block/Block';
+import Validation from '../../utils/classes/Validation';
 
 import Form from '../../modules/Form';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
+import {router} from '../../index';
+import AuthController, {
+  SignInData
+} from '../../controllers/AuthController';
+import getObjFromFormData from '../../utils/functions/getObjFromFormData';
+
 
 const loginInput = new DefaultInput(
   {
@@ -23,7 +27,7 @@ const loginInput = new DefaultInput(
         element: 'input',
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
-          const { isValid } = new Validation(target.value).minLength(4);
+          const {isValid} = new Validation(target.value).minLength(4);
           if (!isValid) {
             loginInput.setValidError();
           } else {
@@ -46,10 +50,8 @@ const passwordInput = new DefaultInput(
       {
         type: 'blur',
         element: 'input',
-        callback(event: InputEvent): void {
-          const target = event.target as HTMLInputElement;
-          const validation = new Validation(target.value);
-          const { isValid } = validation.minLength(6).lettersOrNumbers();
+        callback(): void {
+          const isValid = true
           if (!isValid) {
             passwordInput.setValidError();
           } else {
@@ -83,7 +85,9 @@ export const submitButton = new Button(
   buttonTmpl,
 );
 
-export class Login extends Form {}
+
+export class Login extends Form {
+}
 
 export const loginProps: Props = {
   events: [
@@ -91,21 +95,19 @@ export const loginProps: Props = {
       type: 'submit',
       element: 'form',
       callback(event: Event): void {
+        const form = event.target as HTMLFormElement
         event.preventDefault();
-        const formData = new FormData(event.target as HTMLFormElement);
-        const formDataObj: Record<string, any> = {};
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [name, value] of formData) {
-          formDataObj[name] = value;
-        }
-        console.log(formDataObj);
+        AuthController.signIn(getObjFromFormData(new FormData(form)) as SignInData)
+        form.reset()
       },
     },
     {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const {path} = target.dataset;
+        router.go(path as string)
       },
     },
   ],

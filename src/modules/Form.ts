@@ -1,4 +1,4 @@
-import Block, { Props } from '../utils/Block';
+import Block, {Props} from './Block/Block';
 
 class Form extends Block {
   constructor(props: Props, tmpl: string) {
@@ -6,10 +6,18 @@ class Form extends Block {
     if (this.props.components) {
       Object.keys(this.props.components).forEach((key) => {
         if (this.props.components !== undefined) {
-          const component = this.props.components[key] as Block;
-          component.setProps({
-            checkFormValid: this.checkFormValid.bind(this),
-          });
+          const component = this.props.components[key] ;
+          if (Array.isArray(component)) {
+            component.forEach(comp => {
+              comp.setProps({
+                checkFormValid: this.checkFormValid.bind(this),
+              });
+            })
+          } else {
+            component.setProps({
+              checkFormValid: this.checkFormValid.bind(this),
+            });
+          }
         }
       });
     }

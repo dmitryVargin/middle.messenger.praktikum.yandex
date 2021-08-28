@@ -33,9 +33,14 @@ body {
   height: 100%;
 }
 
-.root,
-.app {
+.root {
   height: 100%;
+  margin: 0 auto;
+  max-width: 1680px;
+}
+
+img {
+  max-width: 100%;
 }
 
 
@@ -47,6 +52,19 @@ body {
   position: fixed;
   top: 0;
   width: 100%;
+
+  .title-wrap {
+    display: flex;
+    justify-content: space-evenly;
+
+    margin-bottom: 15px;
+
+    .title {
+      align-items: center;
+      display: flex;
+      margin-bottom: 0;
+    }
+  }
 
   .title {
     color: $main-text-color;
@@ -81,12 +99,39 @@ body {
 }
 
 //Pages
-.page {
-  margin: 0 auto;
-  max-width: 1680px;
-}
+
 
 //Chat
+.user-item {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  .user-info {
+    align-items: center;
+    display: flex;
+  }
+
+  .user-avatar {
+    align-items: center;
+    border-radius: 50%;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    margin-right: 10px;
+    width: 50px;
+
+    &.empty {
+      background: $orange;
+    }
+  }
+}
+
+.user-item:last-of-type {
+  margin-bottom: 0;
+}
+
 .chat-wrap {
   border: 1px solid #e1ebf1;
   display: flex;
@@ -147,6 +192,10 @@ body {
       background: $user-message-bg;
     }
 
+    .content {
+      max-width: 80%;
+    }
+
     &.active {
       background: $checked-chat-bg;
 
@@ -199,11 +248,24 @@ body {
 
 
     .img {
-      background: $orange;
+      align-items: center;
       border-radius: 50%;
+      display: flex;
       height: 50px;
+      justify-content: center;
       margin-right: 10px;
-      width: 50px;
+      max-width: 50px;
+      min-width: 50px;
+
+      &.empty {
+        background: $orange;
+      }
+
+      img {
+        border-radius: 50%;
+        height: 100%;
+        max-width: 100%;
+      }
     }
 
     .name {
@@ -212,12 +274,18 @@ body {
       font-weight: 600;
       line-height: $title-lh;
       margin-bottom: 5px;
+      padding-right: 55px;
     }
 
     .last-msg {
       color: $additional-text-color;
       font-size: $subtitle-fz;
       line-height: $subtitle-lh;
+      max-width: 90%;
+      overflow: hidden;
+      padding-right: 25px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 }
@@ -229,6 +297,7 @@ body {
   width: 100%;
 
   .header {
+    align-items: center;
     border-bottom: 1px solid $lines-color;
     display: flex;
     justify-content: space-between;
@@ -248,12 +317,55 @@ body {
     }
 
     .chat-img {
-      background: $orange;
       border-radius: 50%;
       height: 40px;
       margin-right: 10px;
-
       width: 40px;
+
+      img {
+        border-radius: 50%;
+        height: 100%;
+      }
+
+      &.empty {
+        background: $orange;
+
+        img {
+          display: none;
+        }
+      }
+    }
+
+
+  }
+
+  .settings-btn {
+    position: relative;
+  }
+
+  .settings-popup {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.14);
+    padding: 10px 15px;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    z-index: 3;
+    //display: none;
+
+    .img-btn {
+      margin-right: 10px;
+    }
+
+    &.active {
+      display: block;
+    }
+
+    .item {
+      align-items: center;
+      display: flex;
+      min-width: 210px;
     }
   }
 
@@ -382,10 +494,17 @@ body {
     text-align: center;
   }
 
+  .profile-img {
+    border-radius: 50%;
+    max-width: 100%;
+    min-height: 100%;
+  }
+
   .img-wrap {
     align-items: center;
     background: #e1ebf1;
     border-radius: 50%;
+    cursor: pointer;
     display: flex;
     height: 100px;
     justify-content: center;
@@ -497,6 +616,11 @@ body {
   margin: 0 10px 20px;
   position: relative;
 
+  .input-inner-wrap {
+    align-items: center;
+    display: flex;
+  }
+
   &.fullwidth {
     width: 100%;
 
@@ -574,6 +698,7 @@ body {
   display: flex;
   height: 50px;
   justify-content: center;
+  margin: 0 auto;
   max-width: 280px;
   width: 100%;
 
@@ -586,6 +711,16 @@ body {
     box-shadow: none;
     cursor: default;
   }
+}
+
+.circle-button {
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
 }
 
 .arrow-button {

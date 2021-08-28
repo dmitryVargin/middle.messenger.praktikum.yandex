@@ -1,12 +1,13 @@
-import { Props } from '../../utils/Block';
+import {Props} from '../../modules/Block/Block';
 import DefaultInput from '../../components/DefaultInput';
 import Button from '../../components/Button';
 import buttonTmpl from '../../components/Button/index.tmpl';
 import defaultInputTmpl from '../../components/DefaultInput/index.tmpl';
-import Validation from '../../utils/Validation';
-import historyPush from '../../utils/historyPush';
-import { appRerender } from '../../index';
+import Validation from '../../utils/classes/Validation';
+import {router} from '../../index';
 import Form from '../../modules/Form';
+import AuthController from '../../controllers/AuthController';
+import getObjFromFormData from '../../utils/functions/getObjFromFormData';
 
 const emailInput = new DefaultInput(
   {
@@ -21,7 +22,7 @@ const emailInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.email();
+          const {isValid} = validation.email();
           if (!isValid) {
             emailInput.setValidError();
           } else {
@@ -47,7 +48,7 @@ const loginInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.minLength(4).lettersOrNumbers();
+          const {isValid} = validation.minLength(4).lettersOrNumbers();
           if (!isValid) {
             loginInput.setValidError();
           } else {
@@ -72,7 +73,7 @@ const firstNameInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.minLength(2).onlyLetters();
+          const {isValid} = validation.minLength(2).onlyLetters();
           if (!isValid) {
             firstNameInput.setValidError();
           } else {
@@ -97,7 +98,7 @@ const secondNameInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.minLength(2).onlyLetters();
+          const {isValid} = validation.minLength(2).onlyLetters();
           if (!isValid) {
             secondNameInput.setValidError();
           } else {
@@ -122,7 +123,7 @@ const phoneInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.phone();
+          const {isValid} = validation.phone();
           if (!isValid) {
             phoneInput.setValidError();
           } else {
@@ -147,7 +148,7 @@ const passwordInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          const { isValid } = validation.minLength(6).lettersOrNumbers();
+          const {isValid} = validation.minLength(6).lettersOrNumbers();
           if (!isValid) {
             passwordInput.setValidError();
           } else {
@@ -172,7 +173,7 @@ const passwordAgainInput = new DefaultInput(
         callback(event: InputEvent) {
           const target = event.target as HTMLInputElement;
           const validation = new Validation(target.value);
-          let { isValid } = validation.minLength(6).lettersOrNumbers();
+          let {isValid} = validation.minLength(6).lettersOrNumbers();
           const anotherPasswordField = document.querySelector('[name=password]') as HTMLInputElement;
           if (anotherPasswordField !== null) {
             isValid = isValid && anotherPasswordField.value === target.value;
@@ -209,7 +210,8 @@ const submitBtn = new Button(
   buttonTmpl,
 );
 
-export class Signup extends Form {}
+export class Signup extends Form {
+}
 
 export const signupProps: Props = {
   events: [
@@ -218,20 +220,16 @@ export const signupProps: Props = {
       element: 'form',
       callback(event: Event): void {
         event.preventDefault();
-        const formData = new FormData(event.target as HTMLFormElement);
-        const formDataObj: Record<string, any> = {};
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [name, value] of formData) {
-          formDataObj[name] = value;
-        }
-        console.log(formDataObj);
+        AuthController.signUp(getObjFromFormData(new FormData(event.target as HTMLFormElement)))
       },
     },
     {
       type: 'click',
       element: '[data-path]',
       callback(event: Event): void {
-        historyPush(event, appRerender);
+        const target = event.target as HTMLElement;
+        const {path} = target.dataset;
+        router.go(path as string)
       },
     },
   ],
