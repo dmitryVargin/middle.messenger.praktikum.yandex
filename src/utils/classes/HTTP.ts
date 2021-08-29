@@ -104,6 +104,7 @@ class HTTP {
       if (isGet || !data) {
         xhr.send();
       } else {
+        // @ts-ignore
         xhr.send(data as BodyInit);
       }
     });
