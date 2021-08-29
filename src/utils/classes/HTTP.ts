@@ -104,6 +104,7 @@ class HTTP {
       if (isGet || !data) {
         xhr.send();
       } else {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         xhr.send(data as BodyInit);
       }
