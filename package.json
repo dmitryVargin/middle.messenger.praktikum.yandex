@@ -7,7 +7,8 @@
     "build": "webpack",
     "eslint": "eslint src",
     "stylelint": "stylelint src/*.scss",
-    "test": "mocha"
+    "test": "mocha",
+    "prepare": "husky install"
   },
   "husky": {
     "hooks": {
