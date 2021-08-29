@@ -1,11 +1,11 @@
-import plusIcon from 'url:../../../static/img/plus.svg';
-import dotBtn from 'url:../../../static/img/dot-btn.svg';
-import attachIcon from 'url:../../../static/img/attach.svg';
-import userIcon from 'url:../../../static/img/user-icon.svg';
-import camera from 'url:../../../static/img/camera.svg';
-import trash from 'url:../../../static/img/trash.svg';
-import settingIcon from 'url:../../../static/img/settings.svg';
-import {resourcesUrl} from '../../constants/urls';
+import plusIcon from '../../../static/img/plus.svg';
+import dotBtn from '../../../static/img/dot-btn.svg';
+import attachIcon from '../../../static/img/attach.svg';
+import userIcon from '../../../static/img/user-icon.svg';
+import camera from '../../../static/img/camera.svg';
+import trash from '../../../static/img/trash.svg';
+import settingIcon from '../../../static/img/settings.svg';
+import { resourcesUrl } from '../../constants/urls';
 
 export default `
   <div class='chat-wrap'>

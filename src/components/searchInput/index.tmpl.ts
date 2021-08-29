@@ -1,4 +1,4 @@
-import searchIcon from 'url:../../../static/img/search.svg';
+import searchIcon from '../../../static/img/search.svg';
 
 export default `
   <div class='input-wrap'>

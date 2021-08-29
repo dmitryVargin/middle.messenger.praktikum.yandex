@@ -1,24 +1,23 @@
-import {Login, loginProps} from './pages/login';
+import { Login, loginProps } from './pages/login';
 import loginTmpl from './pages/login/index.tmpl';
 
-import {Signup, signupProps} from './pages/signup';
+import { Signup, signupProps } from './pages/signup';
 import signupTmpl from './pages/signup/index.tmpl';
 
-import {Profile, profileProps} from './pages/profile';
+import { Profile, profileProps } from './pages/profile';
 import profileTmpl from './pages/profile/index.tmpl';
 
-import {Messenger, messengerProps} from './pages/messenger';
+import { Messenger, messengerProps } from './pages/messenger';
 import chatTmpl from './pages/messenger/index.tmpl';
-
 
 import ErrorPage from './pages/errorPage';
 import errorPageTmpl from './pages/errorPage/index.tmpl';
 
 import './index.scss';
-import Block, {Props} from './modules/Block/Block';
+import Block, { Props } from './modules/Block/Block';
 import Router from './utils/classes/Router';
 
-import {storeEventBus} from './store/Store';
+import { storeEventBus } from './store/Store';
 import messages from './components/Messages';
 import userListPopup from './components/popups/ChatUserListPopup';
 import chatUserAddPopup from './components/popups/ChatUserAddPopup';
@@ -29,8 +28,8 @@ const routesToElem: {
     props: Props;
     value: Block | null;
     tmpl: string;
-    isProtected: boolean,
-    listenedStoreField: string[],
+    isProtected: boolean;
+    listenedStoreField: string[];
   };
 } = {
   '/': {
@@ -67,35 +66,45 @@ const routesToElem: {
   },
 };
 
-
 export const router = new Router('#root');
 
 Object.keys(routesToElem).forEach((routeInfo) => {
-  const {
-    Class,
-    props,
-    tmpl,
-    isProtected,
-    listenedStoreField
-  } = routesToElem[routeInfo]
+  const { Class, props, tmpl, isProtected, listenedStoreField } = routesToElem[routeInfo];
 
-  const block = new Class(props, tmpl)
-  router.use(routeInfo, block, isProtected)
+  const block = new Class(props, tmpl);
+  router.use(routeInfo, block, isProtected);
   listenedStoreField.forEach((field) => {
-    const callback = block.setProps.bind(block)
-    storeEventBus.on(field, callback)
-  })
-})
-storeEventBus.on('activeChatMessages', messages.setProps.bind(messages))
-storeEventBus.on('activeChatUsers', userListPopup.setProps.bind(userListPopup))
-storeEventBus.on('searchUserList', chatUserAddPopup.setProps.bind(chatUserAddPopup))
+    const callback = block.setProps.bind(block);
+    storeEventBus.on(field, callback);
+  });
+});
+storeEventBus.on('activeChatMessages', messages.setProps.bind(messages));
+storeEventBus.on('activeChatUsers', userListPopup.setProps.bind(userListPopup));
+storeEventBus.on('searchUserList', chatUserAddPopup.setProps.bind(chatUserAddPopup));
 
-router.use('errorPage', new ErrorPage({
-  error: {
-    code: '404',
-    message: 'Страница не существует',
-  },
-}, errorPageTmpl), false)
+router.use(
+  'errorPage',
+  new ErrorPage(
+    {
+      error: {
+        code: '404',
+        message: 'Страница не существует',
+      },
+      events: [
+        {
+          type: 'click',
+          element: '[data-path]',
+          callback(event: Event): void {
+            const target = event.target as HTMLElement;
+            const { path } = target.dataset;
+            router.go(path as string);
+          },
+        },
+      ],
+    },
+    errorPageTmpl,
+  ),
+  false,
+);
 
 router.start();
-

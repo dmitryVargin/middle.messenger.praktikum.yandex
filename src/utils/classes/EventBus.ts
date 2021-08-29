@@ -1,5 +1,5 @@
 type CallbackArgs = unknown[];
-type Callback = (...args: CallbackArgs) => void;
+type Callback = (...args: any) => void;
 type Event = string;
 
 class EventBus {

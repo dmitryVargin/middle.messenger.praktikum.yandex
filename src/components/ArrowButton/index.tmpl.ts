@@ -1,4 +1,4 @@
-import arrowImg from 'url:../../../static/img/arrow.svg';
+import arrowImg from '../../../static/img/arrow.svg';
 
 const arrowButtonTmpl = `
   <div class='arrow-button'>

@@ -3,15 +3,23 @@
     "module": "commonjs",
     "target": "esnext",
     "strict": true,
-    "sourceMap": true,
+    "declaration": true,
     "noImplicitAny": true,
+    "outDir": "./dist",
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules"

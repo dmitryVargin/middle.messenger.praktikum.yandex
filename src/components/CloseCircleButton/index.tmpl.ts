@@ -1,4 +1,4 @@
-import closeCircle from 'url:../../../static/img/close_circle.svg';
+import closeCircle from '../../../static/img/close_circle.svg';
 
 const closeCircleButtonTmpl = `
   <div class='circle-button'>
