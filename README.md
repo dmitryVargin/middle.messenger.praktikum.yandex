@@ -5,13 +5,20 @@
 
 Netlify https://adoring-morse-4ee1ae.netlify.app/
 
-Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/3
+Ссылка на Pr: https://github.com/dmitryVargin/middle.messenger.praktikum.yandex/pull/4
 
-Кровью и потом, с большой просрочкой - минимально реализован функционал.
-Точно остались баги, лишние ререндеры и запросы.
-Обработаны не все исключения.
+Heroku: https://yandex-messenger-dmitry-vargin.herokuapp.com/
 
-Финализировать буду на 4 спринте, слишком сильно застрял с этим.
+
+Команды: npm run ${command}
+dev - development,
+build - production
+eslint - js linting 
+stylelint - style linting
+test - run tests
+
+Parcel заменен на webpack
+Подключен docker, контейнер выложен на heroku.
 
 
 
