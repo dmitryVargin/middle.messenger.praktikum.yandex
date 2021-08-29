@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Learning project",
   "scripts": {
+    "start": "webpack && node server",
     "dev": "webpack serve --mode=development --progress",
     "build": "webpack",
     "eslint": "eslint src",
