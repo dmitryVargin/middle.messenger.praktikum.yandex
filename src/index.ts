@@ -81,7 +81,7 @@ Object.keys(routesToElem).forEach((routeInfo) => {
 storeEventBus.on('activeChatMessages', messages.setProps.bind(messages));
 storeEventBus.on('activeChatUsers', userListPopup.setProps.bind(userListPopup));
 storeEventBus.on('searchUserList', chatUserAddPopup.setProps.bind(chatUserAddPopup));
-
+//
 router.use(
   'errorPage',
   new ErrorPage(
