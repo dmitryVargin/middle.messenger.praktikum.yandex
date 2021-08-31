@@ -1,7 +1,6 @@
 import EventBus from '../../utils/classes/EventBus';
 import Templator from '../../utils/classes/Templator';
 
-
 enum EVENTS {
   INIT = 'init',
   FLOW_CDM = 'flow:component-did-mount',
@@ -51,7 +50,6 @@ class Block {
 
   private _boundEvents: PropsEvent[];
 
-
   constructor(props = {}, tmpl: string) {
     this._boundEvents = [];
     this.eventBus = new EventBus();
@@ -59,7 +57,7 @@ class Block {
       tmpl,
       props,
     };
-    this.props = this._makeProxy({...props});
+    this.props = this._makeProxy({ ...props });
 
     this._registerEvents();
     this.eventBus.emit(EVENTS.INIT);
@@ -76,7 +74,7 @@ class Block {
   }
 
   create(): void {
-    this.eventBus.emit(EVENTS.INIT)
+    this.eventBus.emit(EVENTS.INIT);
   }
 
   getContent(): HTMLElement {
@@ -87,7 +85,7 @@ class Block {
     if (!nextProps) {
       return;
     }
-    Object.assign(this.props, {...nextProps});
+    Object.assign(this.props, { ...nextProps });
   };
 
   render(): HTMLCollection {
@@ -95,8 +93,7 @@ class Block {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  componentDidMount() {
-  }
+  componentDidMount() {}
 
   protected init(): void {
     this._createResources();
@@ -131,9 +128,9 @@ class Block {
       get: (target, prop: string): T => {
         const value = target[prop];
         if (typeof value === 'function') {
-          return value.bind(target) as T
+          return value.bind(target) as T;
         }
-        return value
+        return value;
       },
       set: (target, prop: string, value: T) => {
         if (typeof target[prop] === 'object') {
@@ -145,7 +142,7 @@ class Block {
         } else {
           target[prop] = value;
         }
-        this.eventBus.emit(EVENTS.FLOW_CDU, {...target}, target);
+        this.eventBus.emit(EVENTS.FLOW_CDU, { ...target }, target);
         return true;
       },
       deleteProperty: () => {
@@ -169,8 +166,7 @@ class Block {
 
   private addEvents(): void {
     const events = this._boundEvents;
-    events.forEach(({type, element, callback}) => {
-
+    events.forEach(({ type, element, callback }) => {
       if (!element) {
         return;
       }
@@ -189,7 +185,7 @@ class Block {
   private removeEvents(): void {
     const events = this._boundEvents;
 
-    events.forEach(({type, element, callback}) => {
+    events.forEach(({ type, element, callback }) => {
       if (!element) {
         return;
       }
@@ -211,7 +207,7 @@ class Block {
     }
 
     this._boundEvents = [];
-    this.props.events.forEach(({type, element, callback}) => {
+    this.props.events.forEach(({ type, element, callback }) => {
       this._boundEvents.push({
         type,
         element,
@@ -248,7 +244,7 @@ class Block {
           }
         } else {
           const attribute = obj[key] as Attribute;
-          const {type, value} = attribute;
+          const { type, value } = attribute;
           if (type === 'set') {
             innerEl.setAttribute(key, <string>value);
           } else if (type === 'remove') {
@@ -264,22 +260,23 @@ class Block {
   private _render(): void {
     const block = this.render();
 
-
     if (block.length) {
       this._element.innerHTML = '';
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       this._element.append(...block);
     }
     this.removeEvents();
     this.setAttributes(this._element);
     this.addEvents();
-    this.afterRender()
+    this.afterRender();
   }
 
-  forceUpdate():void {
+  forceUpdate(): void {
     this.eventBus.emit(EVENTS.INIT);
   }
 
-  afterRender():void {}
+  afterRender(): void {}
 }
 
 export default Block;

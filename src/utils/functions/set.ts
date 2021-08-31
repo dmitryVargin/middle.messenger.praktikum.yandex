@@ -6,27 +6,26 @@ type Indexed<T = unknown> = {
 
 function set(object: Indexed | unknown, path: string, value: unknown): Indexed | unknown {
   if (!isPlainObject(object)) {
-    return object
+    return object;
   }
 
-  const pathArr = path.split('.')
+  const pathArr = path.split('.');
   if (pathArr.length === 1) {
-    object[path] = value
+    object[path] = value;
   } else {
-    let current = object
+    let current = object;
     for (let i = 0; i < pathArr.length; i++) {
       if (i === pathArr.length - 1) {
-        current[pathArr[i]] = value
+        current[pathArr[i]] = value;
       } else {
-        current[pathArr[i]] = {}
-        current = current[pathArr[i]]
+        current[pathArr[i]] = {};
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        current = current[pathArr[i]];
       }
     }
   }
 
-  return object
+  return object;
 }
 
-
-export default set
-
+export default set;

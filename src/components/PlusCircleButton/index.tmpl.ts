@@ -1,4 +1,4 @@
-import plusCircle from 'url:../../../static/img/plus_circle.svg';
+import plusCircle from '../../../static/img/plus_circle.svg';
 
 const plusCircleButtonTmpl = `
   <div class='circle-button'>

@@ -1,5 +1,7 @@
 dist
-.parcel-cache
+static
 .eslintrc.js
 src/test/babel-register.js
 src/utils/functions/cloneDeep.ts
+package-lock.json
+package.json

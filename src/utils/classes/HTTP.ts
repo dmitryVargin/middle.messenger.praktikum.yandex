@@ -1,4 +1,4 @@
-import queryStringify, {PlainObject} from '../functions/queryStringify';
+import queryStringify, { PlainObject } from '../functions/queryStringify';
 
 const METHODS = {
   GET: 'GET',
@@ -7,22 +7,22 @@ const METHODS = {
   DELETE: 'DELETE',
 };
 
-type Data = FormData | Record<string, unknown> | string
+type Data = FormData | Record<string, unknown> | string;
 
 export type RequestOptions = {
-  method?: string
-  timeout?: number
-  withCredentials?: boolean
-  data?: Data
-  headers?: Record<string, any>
-  [key: string]: any
+  method?: string;
+  timeout?: number;
+  withCredentials?: boolean;
+  data?: Data;
+  headers?: Record<string, any>;
+  [key: string]: any;
 };
 
 class HTTP {
   private url: string;
 
   constructor(url: string) {
-    this.url = url
+    this.url = url;
   }
 
   get = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> =>
@@ -66,7 +66,7 @@ class HTTP {
     );
 
   request = (url: string, options: RequestOptions = {}, timeout = 5000): Promise<XMLHttpRequest> => {
-    const {headers = {}, method, data, withCredentials} = options;
+    const { headers = {}, method, data, withCredentials } = options;
 
     return new Promise((resolve, reject) => {
       if (!method) {
@@ -77,11 +77,11 @@ class HTTP {
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
 
-      xhr.withCredentials = !!withCredentials
+      xhr.withCredentials = !!withCredentials;
 
       xhr.open(method, isGet && !!data ? `${this.url + url}${queryStringify(data as PlainObject)}` : this.url + url);
 
-      (Object.keys(headers)).forEach((key) => {
+      Object.keys(headers).forEach((key) => {
         xhr.setRequestHeader(key, headers[key]);
       });
 
@@ -104,11 +104,12 @@ class HTTP {
       if (isGet || !data) {
         xhr.send();
       } else {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         xhr.send(data as BodyInit);
       }
     });
   };
 }
 
-
-export default HTTP
+export default HTTP;
